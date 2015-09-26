@@ -1,0 +1,160 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+	<meta charset="utf-8" />
+    <title>javascript 手动触发事件</title>
+
+</head>
+<body>
+<pre>
+function triggerEvet (el,type,evt,doc) {
+	doc = document;
+	if(doc.createEvent) {
+		try {
+			evt = new Event(type); // 现代浏览器
+		}catch(e) {
+			evt = doc.createEvent('HTMLEvents'); //IE9
+			evt.initEvent(type,true,false);
+		}
+		el.dispatchEvent(evt);
+	} else {//IE8及以下
+		evt = doc.createEventObject();
+		el.fireEvent('on'+type,evt);
+	}	
+}
+</pre>
+<button type="button" id="button" onclick="alert('按钮一个')">点我</button>
+<p>
+	一个链接：<a href="http://jo2.org" target="_blank" id="a">脚儿网</a>. <br />
+	链接，不加任何事件，IE8以下，调用其fireEvent的onclick，不会触发其默认点击事件（即，不会打开链接地址），但如果有绑定click事件，则会顺利触发 <br />
+	此时，应该直接使用a.click()来触发其点击事件
+</p>
+<p>
+	<input type="text" name="input" id="input" value="文本框" />
+	<br />
+	文本框，不绑事件，直接triggerEvent其focus事件，在任何浏览器下都没有获得焦点(默认行为) <br />
+	但是，绑定到focus上的事件会顺利触发
+</p>
+<script>
+function $ (id) {return document.getElementById(id)};
+function addEvent(el,type,fn) {
+	if(el.addEventListener) {
+		el.addEventListener(type,fn,false);
+	} else {
+		el.attachEvent('on'+type,fn);
+	}
+}
+function click1 () {
+	console.log('click1')
+}
+function click2 () {
+	console.log('click2');
+	triggerEvet($('a'),'click'); //可能会被浏览器阻止
+	// $('a').click()
+}
+function clicka () {
+	console.log('click on a')
+}
+function focusInput() {
+	console.log('focus in input')
+}
+function obje (){
+	alert(this.name)
+}
+var obj = {name:'Object1'}
+addEvent($('button'),'click',click1);
+addEvent($('button'),'click',click2);
+// addEvent(obj,'go',obje);
+addEvent($('a'),'click',clicka);
+addEvent($('input'),'focus',focusInput);
+function triggerEvet (el,type,evt,doc) {
+	doc = document;
+	if(doc.createEvent) {
+		try {
+			evt = new Event(type); // 现代浏览器
+		}catch(e) {
+			evt = doc.createEvent('HTMLEvents'); //IE9
+			evt.initEvent(type,true,false);
+		}
+		el.dispatchEvent(evt);
+	} else {//IE8及以下
+		evt = doc.createEventObject();
+		// evt.eventType = type;
+		el.fireEvent('on'+type,evt);
+	}	
+}
+// triggerEvet($('button'),'click')
+triggerEvet($('a'),'click')
+triggerEvet($('input'),'focus')
+// console.log($('a').mousedown)
+</script>
+<script>
+	var htmlEvents = {// list of real events
+    //<body> and <frameset> Events
+    load:1,
+    unload:1,
+    //Form Events
+    blur:1,
+    change:1,
+    focus:1,
+    reset:1,
+    select:1,
+    submit:1,
+    //Image Events
+    abort:1,
+    //Keyboard Events
+    keydown:1,
+    keypress:1,
+    keyup:1,
+    //Mouse Events
+    click:1,
+    dblclick:1,
+    mousedown:1,
+    mousemove:1,
+    mouseout:1,
+    mouseover:1,
+    mouseup:1
+}
+
+function triggerEvent(el,eventName){
+    var event;
+    if(document.createEvent){
+        event = document.createEvent('HTMLEvents');
+        event.initEvent(eventName,true,true);
+    }else if(document.createEventObject){// IE < 9
+        event = document.createEventObject();
+        event.eventType = eventName;
+    }
+    event.eventName = eventName;
+    if(el.dispatchEvent){
+        el.dispatchEvent(event);
+    }else if(el.fireEvent && htmlEvents['on'+eventName]){// IE < 9
+        el.fireEvent('on'+event.eventType,event);// can trigger only real event (e.g. 'click')
+    }else if(el[eventName]){
+        el[eventName]();
+    }else if(el['on'+eventName]){
+        el['on'+eventName]();
+    }
+}
+// 这个可以绑自定义事件，但IE下，一个类型只能绑一个事件（也就是el['on'+type]=handler;）
+function addEvent(el,type,handler){
+    if(el.addEventListener){
+        el.addEventListener(type,handler,false);
+    }else if(el.attachEvent && htmlEvents['on'+type]){// IE < 9
+        el.attachEvent('on'+type,handler);
+    }else{
+        el['on'+type]=handler;
+    }
+}
+function removeEvent(el,type,handler){
+    if(el.removeEventListener){
+        el.removeEventListener(type,handler,false);
+    }else if(el.detachEvent && htmlEvents['on'+type]){// IE < 9
+        el.detachEvent('on'+type,handler);
+    }else{
+        el['on'+type]=null;
+    }
+}
+</script>
+</body>
+</html>
