@@ -1,0 +1,19 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+	<meta charset="utf-8" />
+    <title>让console在IE下不报错</title>
+
+</head>
+<body>
+<script>	
+var console = window.console || function  () {
+	var blankfn = function (){};
+	return {
+		log:blankfn,error:blankfn,info:blankfn,warn:blankfn,debug:blankfn
+	}
+}();
+console.log('xxx')
+</script>
+</body>
+</html>

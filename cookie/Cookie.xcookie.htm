@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Javascript中的Cookie</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <script type="text/javascript">
+function setCookie(cName,cValue,cExpires,cPath,cDomain,cSecure){
+    var ocookie=cName + "=" + encodeURIComponent(cValue);
+    //失效时间
+    if(cExpires){
+        ocookie+=";expires=" + cExpires.toGMTString();
+        
+    }
+    //路径
+    if(cPath){
+        ocookie+=";path=" + cPath; 
+    }
+    //域
+    if(cDomain){
+        ocookie+=";domain=" +cDomain;
+    }
+    //安全标志
+    if(cSecure){
+        ocookie+=";secure=" + cSecure;
+    }
+    document.cookie=ocookie;
+}
+function getCookie(cName){
+	//正则表达式，稍不注意就出错
+    var oRE= new RegExp("(?:; )?" + cName + "=([^;]*);?");
+    
+    if(oRE.test(document.cookie)){
+        return decodeURIComponent(RegExp["$1"]);
+    }else{
+        return null;
+    }
+}
+function delCookie(cName,cPath,cDomain){
+    var ocookie=cName + "=; expires="+ (new Date(0)).toGMTString();
+    if(cPath){
+        ocookie+="; Path=" + cPath;
+    }
+    
+    if(cDomain){
+        ocookie+="; domain=" + cDomain;
+    }    
+    document.cookie= ocookie;
+}
+</script>
+<script>
+	console.log(document.cookie)
+	console.log(new Date())
+	var Cookie = function  () {		
+		function getExpires (day) {
+			day-=0;
+			var t = new Date();
+			t.setDate(t.getDate() + day);
+			return ';expires='+(t.toGMTString());
+		}
+		function set (name,value,expires,path,domain,secure) {
+			var ck = '';
+			if(typeof name != 'string') {
+				for(var n in name) {
+					ck += ';'+n+'='+name[n];
+				}
+				ck = ck.slice(1);
+				// console.log(ck)
+			} else {
+				ck = name+'='+escape(value)+";";
+				ck += expires ? getExpires(expires) : '';
+				ck += path ? ';path='+path : '';
+				ck += domain ? ';domain='+domain : '';
+				ck += secure ? ';secure' : '';	
+			}			
+			document.cookie = ck;
+		}
+		function del (name) {
+			document.cookie = name+'='+''+';expires='+(new Date().toGMTString());
+		}
+		return {
+			set: set,
+			get: function (name) {
+				var arr = document.cookie.match(new RegExp("(^| )"+name+"=([^;]*)(;|$)"));
+	     		if(arr != null) return unescape(arr[2]); 
+			},
+			getAll: function () {
+				var arr = document.cookie.split('; ');
+				if(arr.length) {
+					var all = {};
+					for(var a = arr.length;a--;) {
+						var ck = arr[a].split('=');
+						all[ck[0]] = unescape(ck[1]);
+					}
+					return all;
+				}
+			},
+			del: del,
+			delAll: function () {
+				var allNames = document.cookie.match(/[^;=]+=/g);
+				if(allNames && allNames.length) {
+					for(var a = allNames.length;a--;del(allNames[a].slice(0,-1)));
+				}
+				console.log(allNames)
+			}
+		}
+	}();
+	Cookie.set('name','lix');
+	Cookie.set('name2','lix2');
+	Cookie.set({
+		// user:'user1',
+		password:'password1',
+		expires:new Date(2015,1,1).toGMTString()
+	})
+	Cookie.del('user')
+	// Cookie.setExpires(-1)
+	// Cookie.delAll();
+
+	console.log(Cookie.getAll())
+	console.log(document.cookie)
+</script>
+</head>
+<body>
+cookie可以用来保存浏览器历史状态或记录，生成后不清除的话可以一直保存,不论是否刷新页面<br />
+<input type="button" value="点我生成" id="set" />
+
+<input type="button" value="点我删除cookie" id="del" />
+<script type="text/javascript">
+    //alert("Set Cookie...");
+    var set=document.getElementById('set');
+    var del=document.getElementById('del');
+	set.onclick=function(){
+		 setCookie('name','sansan');
+		 alert("The value of cookie 'name' is " + getCookie("name"));
+	}
+	del.onclick=function(){
+		delCookie("name");
+		alert("The value of cookie 'name' is " + getCookie("name"));
+	}
+	document.writeln("<br/>"+getCookie("name"));
+    //setCookie("info","Javascript");
+</script>
+
+</body>
+</html>

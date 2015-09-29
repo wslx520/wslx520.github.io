@@ -141,7 +141,7 @@ function removeEvent(el,type,handler){
 <script>
 	var EventHandle = function  (notIE) {
 		var HTMLEvents = {readystatechange:1,mouseenter:1,mouseleave:1,wheel:1,copy:1,cut:1,paste:1,beforescriptexecute:1,afterscriptexecute:1,abort:1,canplay:1,canplaythrough:1,change:1,click:1,contextmenu:1,dblclick:1,drag:1,dragend:1,dragenter:1,dragleave:1,dragover:1,dragstart:1,drop:1,duratichange:1,emptied:1,ended:1,input:1,invalid:1,keydown:1,keypress:1,keyup:1,loadeddata:1,loadedmetadata:1,loadstart:1,mousedown:1,mousemove:1,mouseout:1,mouseover:1,mouseup:1,pause:1,play:1,playing:1,progress:1,ratechange:1,reset:1,seeked:1,seeking:1,select:1,show:1,stalled:1,submit:1,suspend:1,timeupdate:1,volumechange:1,waiting:1,blur:1,error:1,focus:1,load:1,scroll:1};
-		var prefix = 'custom-event';
+		var prefix = 'custom-event'; //自定义事件的前缀
 		return {
 			add:notIE ? function  (el,type,handler) {
 				el.addEventListener(type,handler,false);
@@ -175,7 +175,9 @@ function removeEvent(el,type,handler){
 			},
 			fire : function (el,type,evt,doc) {
 				doc = document;
-				if(doc.createEvent) {
+				if('function' === typeof el[type]) {
+					el[type](); //针对 a.click()这种原生事件
+				}else if(doc.createEvent) {
 					try {
 						evt = new Event(type); // 现代浏览器
 					}catch(e) {
@@ -205,7 +207,9 @@ EventHandle.add(b1,'click',click1)
 EventHandle.add(b1,'click',click2)
 
 EventHandle.fire(b1,'click')
+// 添加自定义事件
 EventHandle.add(b1,'custom',customE)
+// 触发自定义事件
 EventHandle.fire(b1,'custom')
 // 移除自定义事件
 EventHandle.remove(b1,'custom',customE)
