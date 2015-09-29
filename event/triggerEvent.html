@@ -66,12 +66,15 @@ function obje (){
 function customE () {
 	console.log('customE')
 }
+function customb () {
+	console.log('custom b')
+}
 var obj = {name:'Object1'}
 addEvent($('button'),'click',click1);
 addEvent($('button'),'click',click2);
 addEvent($('button'),'custom',customE);
 // addEvent(obj,'go',obje);
-addEvent($('a'),'click',clicka);
+// addEvent($('a'),'click',clicka);
 addEvent($('input'),'focus',focusInput);
 function triggerEvet (el,type,evt,doc) {
 	doc = document;
@@ -175,8 +178,9 @@ function removeEvent(el,type,handler){
 			},
 			fire : function (el,type,evt,doc) {
 				doc = document;
-				if('function' === typeof el[type]) {
-					el[type](); //针对 a.click()这种原生事件
+				// 最优先针对 a.click()这种原生事件,但IE下typeof el[type] 是object，所以直接判断函数的apply是否存在
+				if(el[type] && el[type].apply) {
+					el[type]();
 				}else if(doc.createEvent) {
 					try {
 						evt = new Event(type); // 现代浏览器
@@ -209,12 +213,15 @@ EventHandle.add(b1,'click',click2)
 EventHandle.fire(b1,'click')
 // 添加自定义事件
 EventHandle.add(b1,'custom',customE)
+EventHandle.add(b1,'custom',customb)
 // 触发自定义事件
 EventHandle.fire(b1,'custom')
 // 移除自定义事件
 EventHandle.remove(b1,'custom',customE)
-// 移除后无法触发了
+// 移除后无法触发了，没移除的还能触发
 EventHandle.fire(b1,'custom')
+
+EventHandle.fire($('a'),'click');
 </script>
 </body>
 </html>
