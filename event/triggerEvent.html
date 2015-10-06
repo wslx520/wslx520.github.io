@@ -44,12 +44,12 @@ function click1 (e) {
 	console.log(e.srcElement.tagName,'click1')
 }
 function click2 () {
-	console.log(this.tagName);
+	console.log('click2 '+this.tagName);
 	// triggerEvet($('a'),'click'); //可能会被浏览器阻止
 	// $('a').click()
 }
 function mousedown1 () {
-	console.log('mouse down1')
+	console.log('mouse down1 '+this.tagName)
 }
 function clicka () {
 	console.log('click on a')
@@ -61,7 +61,7 @@ function obje (){
 	alert(this.name)
 }
 function customE () {
-	console.log('customE')
+	console.log('customE '+this.tagName)
 }
 function customb () {
 	console.log('custom b')
@@ -72,12 +72,16 @@ function customb () {
 <script>
 var eh = EventManager;
 var b1 = $('b1');
+var a = $('a');
 eh.add(b1,'click',click1)
 eh.add(b1,'click',click2)
 eh.add(b1,'mousedown',mousedown1)
+eh.add(a,'click',clicka)
+eh.add(a,'mousedown',mousedown1)
 
 eh.fire(b1,'click');
 eh.fire(b1,'mousedown');
+eh.fire(a,'mousedown');
 // 添加自定义事件
 eh.add(b1,'custom',customE)
 eh.add(b1,'custom',customb)

@@ -6,26 +6,18 @@
 
 </head>
 <body>
-
-<button type="button" id="button" onclick="alert('按钮一个')">点我</button>
-<p>
-	一个链接：<a href="http://jo2.org" target="_blank" id="a">脚儿网</a>. <br />
-	链接，不加任何事件，IE8以下，调用其fireEvent的onclick，不会触发其默认点击事件（即，不会打开链接地址），但如果有绑定click事件，则会顺利触发 <br />
-	此时，应该直接使用a.click()来触发其点击事件
-</p>
-<p>
-	<input type="text" name="input" id="input" value="文本框" />
-	<br />
-	文本框，不绑事件，直接triggerEvent其focus事件，在任何浏览器下都没有获得焦点(默认行为) <br />
-	但是，绑定到focus上的事件会顺利触发
+让老IE下的event对象具备标准浏览器下event有的方法
 <hr />
 <button id="b1" onclick="click1()">按钮</button>
+<br />
+<a href="http://baidu.com" onclick="click1()">跳百度</a>
 <script src="fixEvent.js"></script>
 <script>
 
 function click1 (e) {
 	e = e || fixEvent(window.event);
-	console.log(e.preventDefault)
+	console.log(e.which)
+	e.preventDefault();
 	console.log('click1')
 }
 function click2 () {

@@ -4,14 +4,14 @@ var EventManager = function  (notIE) {
 		fire_ie = function  (evt) {
 			var returnValue = true;
 			// grab the event object (IE uses a global event object)
-			// evt = evt || fixEvent(((this.ownerDocument || this.document || this).parentWindow || window).event);
 			evt = evt || ((this.ownerDocument || this.document || this).parentWindow || window).event;
 			// get a reference to the hash table of event handlers
 			var handlers = this.events[event.type];
 			// execute each event handler
 			for (var i in handlers) {
-				this.$$handleEvent = handlers[i]; //修复this指向
-				if (this.$$handleEvent(evt) === false) {
+				// this.$$handleEvent = handlers[i]; //修复this指向
+				// if (this.$$handleEvent(evt) === false) {
+				if (handlers[i].call(this,evt) === false) {
 					returnValue = false;
 				}
 			}
@@ -50,7 +50,7 @@ var EventManager = function  (notIE) {
 				// el['on'+type] && el['on'+type]();
 				if(el.events && el.events[type]) {
 					var handlers = el.events[type];
-					for(var i in handlers) handlers[i]();
+					for(var i in handlers) handlers[i].call(el);
 				}
 			}	
 		}

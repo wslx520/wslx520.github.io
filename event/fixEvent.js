@@ -1,8 +1,5 @@
 // 把不标准的event变成标准的event，让其支持标准方法
-var fixEvent = function  (evt) {
-	var 
-	html = document.documentElement,
-	ie = /MSIE (\d)\.(\d)/.test(navigator.userAgent) ? RegExp.$1 : false;
+var fixEvent = function  (html,ie) {
 	return function  (evt) {
 		evt = evt || window.event;
 		if(ie && ie<9) {
@@ -13,9 +10,8 @@ var fixEvent = function  (evt) {
 		  	evt.preventDefault = function  () {evt.returnValue = false;}
 		  	evt.pageX = evt.clientX + html.scrollLeft;
 		  	evt.pageY = evt.clientY + html.scrollTop;
-		}
-		
-		 // 自定义方法，会阻止默认行为，阻止冒泡，
+		}		
+		// 自定义方法，会阻止默认行为，阻止冒泡，
 		if(!evt.stop) {
 		  	evt.stop = function  () {
 		   		evt.preventDefault();
@@ -23,6 +19,5 @@ var fixEvent = function  (evt) {
 		  	}
 		}
 		return evt;
-	}
- 
-}()
+	} 
+}(document.documentElement,/MSIE (\d)\.(\d)/.test(navigator.userAgent) ? RegExp.$1 : false)
