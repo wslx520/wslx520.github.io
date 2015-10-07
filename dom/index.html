@@ -80,7 +80,7 @@
 					文本框name=atext,class=in1: <input type="text" name="atext" id="atext" class="in1" />
 				</td>
 				<td>
-					文本框name=btext: <input type="text" name="btext" id="btext" />
+					文本框name=btext1: <input type="text" name="btext1" id="btext1" />
 				</td>
 			</tr>
 			<tr>
@@ -88,7 +88,7 @@
 					文本框name=atext,class=in: <input type="text" name="atext" id="atext" class="in" />
 				</td>
 				<td>
-					文本框name=btext: <input type="text" name="btext" id="btext" />
+					文本框name=btext: <input type="text" name="btext" class="a b c" data-id="12" id="btext" />
 				</td>
 			</tr>
 			<tr>
@@ -109,7 +109,7 @@
 	function $ (id) {
 		return document.getElementById(id);
 	}
-	is(null,'input#id.in1.in2[type!=text]')
+	console.log(is($('btext'),'input[data-id=12]'))
 </script>
  </body>
 </html>
