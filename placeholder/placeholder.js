@@ -7,28 +7,27 @@ var placeholders = function  (dom,udf) {
 	if(notsupport) {
 		var 
 		clsName = 'x-place-holder',clsReg = /\bx\-place\-holder\b/, color = '#aaa', alreadyStyle = alreadyEvent = 0,
+		types = {text:1,search:1,url:1,tel:1,email:1,password:1,number:1},
 		getPH = function  (target) {
 			return target.getAttribute('placeholder')
 		},
 		createStyle = function  () {
 			var style = dom.createElement('style');
 			style.type = 'text/css';
-			style.innerHTML = '.'+clsName+' {color:'+color+'}';
+			style.rel = "stylesheet";
+			// style.innerHTML = '.'+clsName+' {color:'+color+'}'; //这句在IE8以下会报错
+			style.styleSheet.cssText = '.'+clsName+' {color:'+color+'}';
 			dom.body.appendChild(style);
 			alreadyStyle = 1;
 		},
 		focusHandle = function  (e) {
-			e = e || window.event;
-			var target = e.srcElement;
-			handle(target,true)
+			handle((e || window.event).srcElement,true)
 		},
 		blurHandle = function  (e) {
-			e = e || window.event;
-			var target = e.srcElement;
-			handle(target)
+			handle((e || window.event).srcElement)
 		},
 		handle = function  (target,isfocus) {
-			if(target.value == '' && target.tagName === 'INPUT' && target.type !== 'checkbox' || target.type!=='radio' ) {
+			if(target.tagName === 'TEXTAREA' || target.tagName === 'INPUT' && types[target.type]) {
 				if(isfocus) {
 					if(target.value == getPH(target)) {
 						target.value = '';
@@ -49,10 +48,10 @@ var placeholders = function  (dom,udf) {
 		},
 		initInput = function  (input) {
 			var ph = getPH(input);
-			if(ph!=null && ph!= '' && input.value ==='') {
+			if(ph!=null && ph!= '') {
 				input.actualValue = input.value;
 				input.className += ' '+clsName;
-				input.value = ph;
+				input.value ==='' && (input.value = ph);
 				input.getValue = function  () {
 					return this.value === ph ? '' : this.value;
 				}
@@ -62,15 +61,16 @@ var placeholders = function  (dom,udf) {
 			tag = tag || dom;
 			if(!alreadyStyle) createStyle();
 			if(!alreadyEvent) createEvent();
-			if(tag.tagName === 'INPUT' && target.type !== 'checkbox' && target.type!=='radio') {
+			if(tag.tagName === 'TEXTAREA' || tag.tagName === 'INPUT' && types[tag.type]) {
 				initInput(tag);
 			} else {
 				var inputs = tag.getElementsByTagName('input');
-				for(var i=0,l=inputs.length;i<l;i++) {
-					var input = inputs[i];
-					if(input.type == 'checkbox' || input.type=='radio') {continue;}
-					initInput(input);
+				var textareas = tag.getElementsByTagName('textarea');
+				for(var i=inputs.length,input;i--;) {
+					input = inputs[i];
+					if(types[input.type]) initInput(input);					
 				}		
+				for(i=textareas.length;i--;initInput(textareas[i]));	
 			}
 		};
 		init(dom);

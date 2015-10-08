@@ -5,7 +5,17 @@
 	<title>placeholder兼容</title>
 </head>
 <body>
-<input type="text" placeholder="ppppppppp" onblur="" />
+<input type="text" id="input" placeholder="ppppppppp" onblur="" />
+<br />
+<button onclick="$('input').focus()">使input获得焦点</button>
+<br />
+<input type="url" placeholder="url：网址" /> <br />
+<textarea name="" placeholder="这是个文本框" id="" cols="30" rows="10"></textarea>
 <script src="placeholder.js"></script>
+<script>
+	function $ (id) {
+		return document.getElementById(id);
+	}
+</script>
 </body>
 </html>
