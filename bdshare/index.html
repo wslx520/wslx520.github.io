@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>百度分享测试</title>
+	<link rel="stylesheet" href="bd.css" />
+</head>
+<body>
+	<!-- Baidu Button BEGIN -->
+
+//加入另一个按钮式分享按钮
+<div id="bdshare" class="bdshare_b" data="type=tools&uid=10006&mini=0&btnArray=0,5,1,4,2,12,9&entrance=pbfloor"><button>分享</button></div>
+<br />
+<br />
+<div id="bdshare" class="bdshare_b" data="type=tools&uid=10006&mini=0&btnArray=0,5,1,4,2,12,9&entrance=pbfloor"><button>分享</button></div>
+
+//最后加入一个百度分享公共的js脚本，如果您希望在增加一个侧栏式按钮，可以向下面这样将type设置成slide
+<script type="text/javascript" id="bdshare_js" data="type=tools&mini=3" ></script> 
+<script type="text/javascript" id="bdshell_js"></script> 
+<script type="text/javascript">
+window._bd_share_config=window.bds_config ={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":["mshare","qzone","tsina","weixin","renren","tqq","bdxc","kaixin001","tqf","tieba","douban","sqq","youdao","xinhua","ty","copy","print"],"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};
+	document.getElementById('bdshell_js').src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=89860593";
+</script>
+<!-- Baidu Button END -->
+
+	<script>
+		function $ (id) {
+			return document.getElementById(id);
+		}
+	</script>
+
+</body>
+	<style type="text/css">
+	#bdshare_m_c {width: 260px;}
+	#bdshare_m_c ul li {width: 47%;}
+	</style>
+</html>

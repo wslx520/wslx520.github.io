@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Javascript 选择文本</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <script type="text/javascript">
+
+	</script>
+</head>
+<body>
+JS实现选中文本框内部分文字的效果：
+<input type="text" name="" id="input" value="123456789011" />
+
+<input type="button" value="选中2-7" id="" onclick="Select(1,7)"  />
+
+据此还可以实现光标位置的定位：
+<input type="button" value="移动光标到开头" onclick="toStart()" />
+<input type="button" value="移动光标到结束" onclick="toEnd()"  />
+<input type="button" value="移动光标到中间" onclick="toMiddle()"  />
+
+<br />
+<p>
+	IE下选input的createTextRange，然后moveStart,moveEnd来设置选取范围,他们的参数都支持负数，但会转成0；<br />
+	其他则通过input的setSelectionRange(start,end)直接设置选取范围（但参数不支持负数，负数会转成0）<br />
+	注：<br />
+	moveStart接收的数字如果小于0,会转成0. <br />
+	moveEnd接收的数字是长度而非下标（跟substr类似），且接收负的长度，表示从尾巴向回选取。
+</p>
+<p>
+	光标定位实际上是把选区起始点设为一致，没有选中，就相当于只移动了光标
+</p>
+<script type="text/javascript">
+var textSelect = function(o, a, b){
+	//o是当前对象，例如文本域对象
+	//a是起始位置，b是终点位置
+	var l = o.value.length;
+	var udf;
+	if(l){
+		//如果非数值，则表示从起始位置选择到结束位置
+		// if(a == udf) a = 0;
+		// if(b == udf) b = 0;
+		//如果为负值，则与长度值相加(浏览器会转成0)
+		// if(a<0) a=l+a;
+		// if(b<0) b=l+b;
+		//如果值超过长度，则就是当前对象值的长度（浏览器会自动修正）
+		// if(a >l) a = l;
+		// if(b >l) b=l;
+		if(o.createTextRange){//IE浏览器
+			var range = o.createTextRange();         
+			// range.moveStart("character",-l);              
+			range.moveEnd("character",-l); //这句的作用是先把选择区结束点移到文本开头
+			range.moveStart("character", a);
+			console.log(a,'  ',b,'  ',b-a)
+			range.moveEnd("character",b-a); //moveEnd的第2个参数是表示移动多少length，不是index
+			range.select();
+		}else{
+			o.setSelectionRange(a, b); //参数不能为负，否则会转成0
+			o.focus();
+		}
+	}
+};
+function $ (id) {
+			return document.getElementById(id);
+		}
+function Select (s,e) {
+	textSelect($('input'),s,e);
+}
+function toStart () {
+	textSelect($('input'),0,0);
+}
+function toEnd () {
+	textSelect($('input'),1000,1000);
+}
+function toMiddle () {
+	textSelect($('input'),5,5);
+}
+</script>
+
+</body>
+</html>
