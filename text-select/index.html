@@ -20,14 +20,17 @@ JS实现选中文本框内部分文字的效果：
 
 <br />
 <p>
-	IE下选input的createTextRange，然后moveStart,moveEnd来设置选取范围,他们的参数都支持负数，但会转成0；<br />
+	IE下选input的createTextRange，然后moveStart,moveEnd来设置选取范围,他们的参数都支持负数；<br />
 	其他则通过input的setSelectionRange(start,end)直接设置选取范围（但参数不支持负数，负数会转成0）<br />
 	注：<br />
 	moveStart接收的数字如果小于0,会转成0. <br />
-	moveEnd接收的数字是长度而非下标（跟substr类似），且接收负的长度，表示从尾巴向回选取。
+	moveEnd的结果会受moveStart的影响，要想选中预期的区域，应先moveEnd再moveStart
 </p>
 <p>
-	光标定位实际上是把选区起始点设为一致，没有选中，就相当于只移动了光标
+	光标定位实际上是把选区起止点设为一致，没有选中，就相当于只移动了光标
+</p>
+<p>
+	建议在设置选取范围时，起点要小于终点
 </p>
 <script type="text/javascript">
 var textSelect = function(o, a, b){
@@ -49,9 +52,11 @@ var textSelect = function(o, a, b){
 			var range = o.createTextRange();         
 			// range.moveStart("character",-l);              
 			range.moveEnd("character",-l); //这句的作用是先把选择区结束点移到文本开头
+			// 下面先移动终点再移动起点，在没有改变起点point之前,可以保证相对位置不变，更容易理解些
+			// 如果先起后终，会得到很奇怪的结果
+			range.moveEnd("character",b);
 			range.moveStart("character", a);
-			console.log(a,'  ',b,'  ',b-a)
-			range.moveEnd("character",b-a); //moveEnd的第2个参数是表示移动多少length，不是index
+			// console.log(a,'  ',b,'  ',b-a)
 			range.select();
 		}else{
 			o.setSelectionRange(a, b); //参数不能为负，否则会转成0
