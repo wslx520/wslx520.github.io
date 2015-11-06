@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>阻止onhashchange</title>
+</head>
+<body>
+<p>
+    结果证实无法阻止
+</p>
+<a href="#a">到锚点a</a> <br />
+<a href="#b">到锚点b</a> <br />
+<a href="#c">到锚点c</a> <br />
+<a href="#d">到锚点d</a> <br />
+<!-- 
+<script>
+window.onhashchange = function  (e) {
+    e = e || window.event;
+    e.preventDefault();
+    e.returnValue = false;
+    e.stopPropagation();
+    console.log(e.target,location.hash)
+    return false;
+}
+window.onbeforeunload = function  () {
+    console.log(1)
+}
+</script>
+ -->
+<script src="../jquery-1.7.2.min.js"></script>
+<script>
+$(window).bind('hashchange',function  () {
+    return false;
+})
+</script>
+</body>
+</html>
