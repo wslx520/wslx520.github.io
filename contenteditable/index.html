@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+	<meta charset="utf-8" />
+    <title>contenteditable</title>
+	<style>	
+		.contenteditable {
+            border: 1px solid #e23;
+            padding: 0.5em;
+            min-height: 200px;
+        }
+	</style>
+</head>
+<body>
+    <div class="contenteditable" contenteditable="true" id="div"></div>
+
+<script>
+    var div = document.getElementById('div');
+    if(div.addEventListener) {
+        div.addEventListener('input',function  () {
+            console.log((this.innerText || this.textContent).length);
+        })    
+    } else {
+        div.attachEvent('input',function  () {
+            console.log((this.innerText || this.textContent).length);
+        })  
+    }
+</script>    
+</body>
+</html>

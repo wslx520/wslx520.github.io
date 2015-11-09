@@ -2,17 +2,33 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head>
 	<meta charset="utf-8" />
-    <title>javascript 手动触发事件</title>
+    <title>IE7的高度100%存在问题</title>
 	<style>	
-		html,body{margin: 0; padding: 	0;}
+		html,body{
+            margin: 0; padding: 	0;
+            height: 100%;
+            overflow: auto;
+        }
+        .pa {
+            position: absolute;
+        }
+        .center {
+            top:91px;bottom:0;left:0;width:100%;background-color: #eee; height:auto; overflow: hidden;
+        }
+        .right {
+            margin-left: 300px;background-color: #dfdfdf; position: relative; min-height: 100%; 
+            *zoom: 1;
+        }
 	</style>
 </head>
 <body>
-<div id="a" style="position: relative;">a
-	<div id="b" style="height:100%;background-color: #eee;width:200px;float: right;min-height: 100%;">b</div>
-	<div id="c" style="height: 1100px; float: left;">
-		c
-	</div>
+<div class="center pa" style="">
+    <div class="left" style="position: fixed;width: 300px; background-color: #f8f8f8;">
+        left
+    </div>
+    <div class="right" style="">
+        right.在IE7下不能铺满
+    </div>
 </div>
 </body>
 </html>
