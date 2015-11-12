@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8" />
     <title>xPagination.js 分页组件</title>
-    <link rel="stylesheet" href="xpagination.css" />
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <h1>xPagination.js Javascript分页组件</h1>
@@ -16,10 +16,20 @@
 <script src="xpagination.js" type="text/javascript"></script>
 <script>	
 var pagediv = document.getElementById('pagediv');
-var pagenav = xPagination({
-    element: pagediv,
-    
+
+var pagenav = xPagination(pagediv, {
+    max:8,
+    curr:2,
+    size:30,
+    items:585,
+    first:false,
+    last:false,
+    jump:true,
+    onpagination: function  (page, size) {
+        console.log(page, size)
+    }
 })
+// pagenav.go(10)
 </script>
 </body>
 </html>

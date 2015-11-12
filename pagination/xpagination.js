@@ -19,10 +19,12 @@ options : 对象，上面列出的静态设置选项
 currPageElement : 当前页码的node
 pageList : Node数组，页码node的列表
 */
-var xPagenation = function (doc) {
-    var hasClass = function (elm, cls) {
+var xPagination = function (doc) {
+    var 
+        hasClass = function (elm, cls) {
+            var c, ecls;
             cls = cls.split(/\s+/);
-            for (var c=cls.length,ecls = ' '+elm.className+' ';c--;) {
+            for (c = cls.length, ecls = ' ' + elm.className + ' '; c--; ) {
                 if(ecls.indexOf(' '+cls[c]+' ') == -1) {
                     return false;
                 }
@@ -44,7 +46,6 @@ var xPagenation = function (doc) {
             elem.className = classes;
             return elem;
         },
-        //{/if}//
         defaults = {
             prev: '&lt;',
             next: '&gt;',
@@ -66,6 +67,12 @@ var xPagenation = function (doc) {
                 }
                 elm = elm.parentNode;
             }
+        },
+        extend = function  (old,newo) {
+            for(var o in newo) {
+                old[o] = newo[o];
+            }
+            return old;
         },
         // 隐藏某元素
         hide = function (elm, f) {
@@ -107,13 +114,13 @@ var xPagenation = function (doc) {
         pageHover = 'page-item-hover',
         pageDisable = 'disable',
         Pagination = function (el, options) {
-            this.options = util.extend({}, defaults);
-            util.extend(this.options, options);
+            this.options = extend({}, defaults);
+            extend(this.options, options);
             var root = this,
-                Options = root.options,
-                pages,
-                curr,
-                max,
+                Options = root.options,                
+                pages = Options.pages-=0,
+                curr = Options.curr-=0,
+                max = Options.max-=0,
                 temp,
                 items = [],
                 start,
@@ -142,15 +149,9 @@ var xPagenation = function (doc) {
                         return Options.curr <= 1 ? 1 : Options.curr - 1;
                     }
                 };
-            Options.pages -= 0;
-            Options.curr -= 0;
-            Options.max -= 0;
-            if (Options.pages === 0) {
-                Options.pages = Math.floor(Options.items / Options.size);
+            if (pages === 0) {
+                pages = Options.pages = Math.floor(Options.items / Options.size);
             }
-            pages = Options.pages;
-            curr = Options.curr;
-            max = Options.max = Options.max;
             temp = el;
             if (el.tagName === 'UL') {
                 var div = create('page-list-wrap');
@@ -184,10 +185,13 @@ var xPagenation = function (doc) {
             for (i = 1; i <= max; i++) {
                 pageList.push('<li class="' + pageItem + '" ui-page="' + i + '">' + i + '</li>');
             }
-            elli = '<li class="page-ellipsis" ui-page="ellipsis">...</li>';
-            pageList.splice(1, 0, elli);
-            pageList.splice(pageList.length - 1, 0, elli);
-            pageList[pageList.length - 1] = '<li class="' + pageItem + '" ui-page="' + pages + '">' + pages + '</li>';
+            if(pages > max) {
+                elli = '<li class="page-ellipsis" ui-page="ellipsis">...</li>';
+                pageList.splice(1, 0, elli);
+                pageList.splice(pageList.length - 1, 0, elli);
+                pageList[pageList.length - 1] = '<li class="' + pageItem + '" ui-page="' + pages + '">' + pages + '</li>';    
+            }
+            
             items = items.concat(pageList);
             noNext = (curr === pages || pages === 0) ? pageDisable : pageItem;
             if (Options.next) {
@@ -200,21 +204,23 @@ var xPagenation = function (doc) {
             }
             // console.log(pageList, items);
             el.innerHTML = items.join('');
-            ui.Control.constructor.call(root, el, options);
-            list = el.children;
+            root.pageList = function  () {
+                var l = el.children.length,i=0,res = [];
+                for(;plStart < l - plEnd;plStart++) {
+                    res.push(el.children[plStart]);
+                }
+                return res;
+            }();
             // root.pageList = list.slice((root.hasEllipsis ? 3 : 2) - (Options.first ? 0 : 1) - (Options.prev ? 0 : 1), (root.hasEllipsis ? -3 : -2) + (Options.last ? 0 : 1) + (Options.next ? 0 : 1));
-            root.pageList = list.slice(plStart, -plEnd);
-            root.ellipsis = root.pageList.splice(1, 1);
-            root.ellipsis.push(root.pageList.splice(-2, 1)[0]);
-
+            if(pages > max) {
+                root.ellipsis = root.pageList.splice(1, 1);
+                root.ellipsis.push(root.pageList.splice(-2, 1)[0]);    
+            }            
+            if(Options.onpagination) root.onpagination = Options.onpagination;
             if (Options.size) {
                 Options.size -= 0;
                 var ul = create('page-list page-size', 'ul'),
-                    sizes = {
-                        15: 0,
-                        30: 1,
-                        50: 2
-                    };
+                    sizes = {15: 0,30: 1,50: 2};
                 ul.innerHTML = '<li class="page-item">15</li><li class="page-item">30</li><li class="page-item">50</li>';
                 temp.insertBefore(ul, el);
                 addClass(ul.children[sizes[Options.size]], pageHover);
@@ -227,9 +233,7 @@ var xPagenation = function (doc) {
                     if (!hasClass(li, pageHover)) {
                         var num = +li.innerHTML;
                         root.options.size = num;
-                        if (root.onpagination) {
-                            root.onpagination(Options.curr, num);
-                        }
+                        root.onpagination && root.onpagination(Options.curr, num);                        
                         for (i = 0; i < 3; i++) {
                             removeClass(ul.children[i], pageHover);
                         }
@@ -271,8 +275,8 @@ var xPagenation = function (doc) {
             el.onclick = function (event) {
                 curr = Options.curr;
                 //console.log(curr)
-                event = core.wrapEvent(event);
-                target = event.target;
+                event = event || window.event;
+                target = event.target || event.srcElement;
                 li = target.tagName === 'LI' ? target : closet(target, function (elm) {
                     return elm.tagName === 'LI';
                 });
@@ -290,92 +294,91 @@ var xPagenation = function (doc) {
             root.go(Options.curr);
         };
         Pagination.prototype.go = function (page) {
-                var root = this,
-                    pageList = root.pageList,
-                    ellipsis = root.ellipsis,
-                    pl = pageList.length,
-                    Options = root.options,
-                    max = Options.max,
-                    pages = Options.pages,
-                    // start = pageCalc(page, Options.pages, Options.max),
-                    li,
-                    i = 1,
-                    num,
-                    showPages = 'center';
-                // 容错。防止有人通过JS直接跳转不存在的页
-                page = page > Options.pages ? Options.pages : (page < 1 ? 1 : page);
-                Options.curr = page;
-                if (root.currPageElement) {
-                    removeClass(root.currPageElement, pageActive);
-                }
-                root.currPageElement = null;
-
-                if (root.onpagination) {
-                    root.onpagination(page, Options.size);
-                }
-                function setActive(li) {
-                    addClass(li, pageActive);
-                    root.currPageElement = li;
-                }
-
-                function setPageNumbers(start) {
-                    // console.log(start);
-                    if (start > pages - max + 1) {
-                        start = pages - max + 2;
-                    }
-                    // console.log(start);
-                    for (i = 1; i < pl - 1; i++) {
-                        li = pageList[i];
-                        num = start + i - 1;
-                        li.innerHTML = num;
-                        li.setAttribute('ui-page', num);
-                        if (num === page) {
-                            setActive(li);
-                        }
-                    }
-                }
-                // console.log(start,page)
-                if (pages <= max) {
-                    setActive(pageList[page - 1]);
-                    hide(ellipsis[0]);
-                    hide(ellipsis[1]);
-                } else {
-                    if (page <= max / 2) {
-                        showPages = 'start';
-                    } else if (page >= Math.floor(pages - max / 2)) {
-                        showPages = 'end';
-                    }
-                    if (showPages === 'center') {
-                        hide(ellipsis[0], '');
-                        hide(ellipsis[1], '');
-                        setPageNumbers(page - Math.floor(max / 2 / 2));
-                    } else if (showPages === 'start') {
-                        hide(ellipsis[0]);
-                        hide(ellipsis[1], '');
-                        setPageNumbers(2);
-                    } else {
-                        hide(ellipsis[0], '');
-                        hide(ellipsis[1]);
-                        setPageNumbers(Math.floor(pages - max / 2));
-                    }
-                }
-
-                if (page !== 1) {
-                    removeClass(pageList[0].previousSibling, pageDisable);
-                    if (page === pages) {
-                        setActive(pageList[pl - 1]);
-                        addClass(pageList[pl - 1].nextSibling, pageDisable);
-                    } else {
-                        removeClass(pageList[pl - 1].nextSibling, pageDisable);
-                    }
-                } else {
-                    setActive(pageList[0]);
-                    addClass(pageList[0].previousSibling, pageDisable);
-                }
-                if (root.jump) {
-                    root.jump.previousSibling.getElementsByTagName('input')[0].value = page;
-                }
-                // console.log(page,start,root.currPageElement)
+            var root = this,
+                pageList = root.pageList,
+                ellipsis = root.ellipsis,
+                pl = pageList.length,
+                Options = root.options,
+                max = Options.max,
+                pages = Options.pages,
+                // start = pageCalc(page, Options.pages, Options.max),
+                li,
+                i,
+                num,
+                showPages = 'center';
+            // 容错。防止有人通过JS直接跳转不存在的页
+            page = page > Options.pages ? Options.pages : (page < 1 ? 1 : page);
+            Options.curr = page;
+            if (root.currPageElement) {
+                removeClass(root.currPageElement, pageActive);
             }
+            root.currPageElement = null;
+            if (root.onpagination && root.onpagination(page, Options.size) === false) return;
+            function setActive(li) {
+                addClass(li, pageActive);
+                root.currPageElement = li;
+            }
+
+            function setPageNumbers(start) {
+                // console.log(start);
+                if (start > pages - max + 1) {
+                    start = pages - max + 2;
+                }
+                // console.log(start);
+                for (i = 1; i < pl - 1; i++) {
+                    li = pageList[i];
+                    num = start + i - 1;
+                    li.innerHTML = num;
+                    li.setAttribute('ui-page', num);
+                    if (num === page) {
+                        setActive(li);
+                    }
+                }
+            }
+            // console.log(start,page)
+            if (pages <= max) {
+                setActive(pageList[page - 1]);
+                // hide(ellipsis[0]);
+                // hide(ellipsis[1]);
+            } else {
+                if (page <= max / 2) {
+                    showPages = 'start';
+                } else if (page >= Math.floor(pages - max / 2)) {
+                    showPages = 'end';
+                }
+                if (showPages === 'center') {
+                    hide(ellipsis[0], '');
+                    hide(ellipsis[1], '');
+                    setPageNumbers(page - Math.floor(max / 2 / 2));
+                } else if (showPages === 'start') {
+                    hide(ellipsis[0]);
+                    hide(ellipsis[1], '');
+                    setPageNumbers(2);
+                } else {
+                    hide(ellipsis[0], '');
+                    hide(ellipsis[1]);
+                    setPageNumbers(Math.floor(pages - max / 2));
+                }
+            }
+
+            if (page !== 1) {
+                removeClass(pageList[0].previousSibling, pageDisable);
+                if (page === pages) {
+                    setActive(pageList[pl - 1]);
+                    addClass(pageList[pl - 1].nextSibling, pageDisable);
+                } else {
+                    removeClass(pageList[pl - 1].nextSibling, pageDisable);
+                }
+            } else {
+                setActive(pageList[0]);
+                addClass(pageList[0].previousSibling, pageDisable);
+            }
+            if (root.jump) {
+                root.jump.previousSibling.getElementsByTagName('input')[0].value = page;
+            }
+            // console.log(page,start,root.currPageElement)
         }
+    return function (pagediv,options) {
+        return new Pagination(pagediv, options);
+    }
 }(document);
