@@ -150,7 +150,7 @@ var xPagination = function (doc) {
                     }
                 };
             if (pages === 0) {
-                pages = Options.pages = Math.floor(Options.items / Options.size);
+                pages = Options.pages = Math.ceil(Options.items / Options.size);
             }
             temp = el;
             if (el.tagName === 'UL') {
@@ -305,7 +305,9 @@ var xPagination = function (doc) {
                 li,
                 i,
                 num,
-                showPages = 'center';
+                showPages = 'center',
+                prev = pageList[0].previousSibling,
+                next = pageList[pl - 1].nextSibling;
             // 容错。防止有人通过JS直接跳转不存在的页
             page = page > Options.pages ? Options.pages : (page < 1 ? 1 : page);
             Options.curr = page;
@@ -361,17 +363,17 @@ var xPagination = function (doc) {
                 }
             }
 
-            if (page !== 1) {
-                removeClass(pageList[0].previousSibling, pageDisable);
-                if (page === pages) {
-                    setActive(pageList[pl - 1]);
-                    addClass(pageList[pl - 1].nextSibling, pageDisable);
-                } else {
-                    removeClass(pageList[pl - 1].nextSibling, pageDisable);
-                }
-            } else {
+            if (page === 1) {
                 setActive(pageList[0]);
-                addClass(pageList[0].previousSibling, pageDisable);
+                dom.addClass(prev, pageDisable);
+            } else {
+                dom.removeClass(prev, pageDisable);
+            }
+            if (page === pages) {
+                setActive(pageList[pl - 1]);
+                dom.addClass(next, pageDisable);
+            } else {
+                dom.removeClass(next, pageDisable);
             }
             if (root.jump) {
                 root.jump.previousSibling.getElementsByTagName('input')[0].value = page;
