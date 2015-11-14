@@ -12,16 +12,67 @@
     更新日期：2015-11-11 <br />
     作者：<a href="http://jo2.org">脚儿网</a> 
 </p>
+<p>
+	<b>使用方法：</b><br />
+	var xxx = xPagination(pagediv, options);<br />
+	其中pagediv是一个div节点，options是参数
+</p>
+<p>
+	<b>options参数说明：</b><br />
+max : 最多同时显示好多页，默认8 <br />
+curr : 当前页码，默认1<br />
+size : 每页显示多少条，默认15。可以是15,30,50的任一个，如果传为false，则不显示切换每页显示条数的标签<br />
+pages : 总好多页。必有，但可以不传而只传items，则会由items和size计算出pages<br />
+items : 总数据条数。如果pages不传，则items必传<br />
+onpagination : 函数，在页码跳转时触发，此函数执行时会自动传入两个参数：page（当前页）, size（当前页显示条数），如果此函数返回false，则不会发生跳页<br />
+info : 是否显示页码信息，默认true，会加入一个page-text用来显示“共N页，当前是第n页”这样的信息<br />
+jump : 是否允许输入页码跳页，默认true,会加入一个页码输入框和确定按钮<br />
+prev ：上一页按钮显示的文字，设为false则不显示上一页按钮，下同<br />
+next ：下一页按钮显示的文字，同上<br />
+last ：末页按钮显示的文字，同上<br />
+first ：首页按钮显示的文字，同上<br />
+</p>
 <div id="pagediv"></div>
+<br />
+<div id="pagediv1"></div>
+<br />
+<div id="pagediv2"></div>
+
 <script src="xpagination.js" type="text/javascript"></script>
 <script>	
 var pagediv = document.getElementById('pagediv');
+var pagediv1 = document.getElementById('pagediv1');
+var pagediv2 = document.getElementById('pagediv2');
 
 var pagenav = xPagination(pagediv, {
     max:8,
     curr:2,
     size:30,
-    items:585,
+    pages:22,
+    first:false,
+    last:false,
+    jump:true,
+    onpagination: function  (page, size) {
+        console.log(page, size)
+    }
+})
+var pagenav1 = xPagination(pagediv1, {
+    max:6,
+    curr:1,
+    size:15,
+    items:586,
+    first:false,
+    last:false,
+    jump:true,
+    onpagination: function  (page, size) {
+        console.log(page, size)
+    }
+})
+var pagenav2 = xPagination(pagediv2, {
+    max:10,
+    curr:1,
+    size:30,
+    items:22,
     first:false,
     last:false,
     jump:true,

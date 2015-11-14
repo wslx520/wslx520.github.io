@@ -48,23 +48,30 @@
 
 .page-list .page-btn {
     font-size: 12px;
+    line-height: 36px;
     letter-spacing: normal;
+    text-align: center;
+    margin-left: 2px;
+    padding: 0;
+    vertical-align: middle;
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    border-radius: 0;
+}
+.page-list .page-btn button{
     text-align: center;
     height: 24px;
     width: 48px;
-    margin-top: 5px;
     line-height: 24px;
+    vertical-align: middle;
     background: #f5f5f5;
-    border-color: #f5f5f5;
-    margin-left: 2px;
-    padding: 0;
+    border: none;
     color: #666;
-    display: inline-block;
     border-radius: 0;
-    button {}
 }
 
-.page-list .page-btn:hover {
+.page-list .page-btn button:hover {
     background: #2299ee;
     border-color: #2299ee;
     color: #ffffff;
@@ -107,7 +114,8 @@
 
 .page-list .page-btn-prev, .page-list .page-btn-next {
     margin: 0 2px;
-    width: 77px;
+    min-width: 24px;
+    padding: 0 5px;
     height: 34px;
     line-height: 34px;
     border: 1px solid #e8e9eb;
@@ -122,9 +130,6 @@
     color: #333;
     letter-spacing: normal;
     cursor: pointer;
-    &.disable {
-        &
-    }
 }
 .page-list .page-btn-prev i, .page-list .page-btn-next i {
     vertical-align: middle;

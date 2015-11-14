@@ -161,6 +161,9 @@ var xPagination = function (doc) {
             } else {
                 el = create('page-list', 'UL');
                 temp.appendChild(el);
+                if(!hasClass(temp, 'page-list-wrap')) {
+                	addClass(temp, 'page-list-wrap');
+                }
             }
             if (Options.first) {
                 plStart += 1;
@@ -225,8 +228,8 @@ var xPagination = function (doc) {
                 temp.insertBefore(ul, el);
                 addClass(ul.children[sizes[Options.size]], pageHover);
                 ul.onclick = function (event) {
-                    event = core.wrapEvent(event);
-                    target = event.target;
+                	event = event || window.event;
+                	target = event.target || event.srcElement;
                     li = target.tagName === 'LI' ? target : closet(target, function (elm) {
                         return elm.tagName === 'LI';
                     });
@@ -253,8 +256,8 @@ var xPagination = function (doc) {
             if (Options.jump) {
                 jumpinput = create('page-text page-input', 'li');
                 jumpinput.innerHTML = '到第<span class="mid-helper"></span><input type="text" class="mid-text page-position">页';
-                jumpbt = create('page-btn btn', 'li');
-                jumpbt.innerHTML = '确定';
+                jumpbt = create('page-btn', 'li');
+                jumpbt.innerHTML = '<button>确定</button>';
                 el.appendChild(jumpinput);
                 jumpinput.onkeydown = function (e) {
                     e = core.wrapEvent(e);
@@ -365,15 +368,15 @@ var xPagination = function (doc) {
 
             if (page === 1) {
                 setActive(pageList[0]);
-                dom.addClass(prev, pageDisable);
+                addClass(prev, pageDisable);
             } else {
-                dom.removeClass(prev, pageDisable);
+                removeClass(prev, pageDisable);
             }
             if (page === pages) {
                 setActive(pageList[pl - 1]);
-                dom.addClass(next, pageDisable);
+                addClass(next, pageDisable);
             } else {
-                dom.removeClass(next, pageDisable);
+                removeClass(next, pageDisable);
             }
             if (root.jump) {
                 root.jump.previousSibling.getElementsByTagName('input')[0].value = page;
