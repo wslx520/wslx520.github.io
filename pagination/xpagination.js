@@ -49,8 +49,8 @@ var xPagination = function (doc) {
         defaults = {
             prev: '&lt;',
             next: '&gt;',
-            last: '&gt;&gt;',
-            first: '&lt;&lt;',
+            last: false,
+            first: false,
             size: 15,
             max: 8,
             pages: 0,
@@ -284,7 +284,7 @@ var xPagination = function (doc) {
                     return elm.tagName === 'LI';
                 });
                 page = li.getAttribute('ui-page');
-                if (page) {
+                if (page && page !== 'ellipsis') {
                     if (pageCodes[page]) {
                         pp = pageCodes[page];
                         page = 'function' === typeof pp ? pp() : pp;
@@ -346,15 +346,15 @@ var xPagination = function (doc) {
                 // hide(ellipsis[0]);
                 // hide(ellipsis[1]);
             } else {
-                if (page <= max / 2) {
+                if (page <= Math.ceil(max / 2)) {
                     showPages = 'start';
-                } else if (page >= Math.floor(pages - max / 2)) {
+                } else if (page >= Math.ceil(pages - max / 2)) {
                     showPages = 'end';
                 }
                 if (showPages === 'center') {
                     hide(ellipsis[0], '');
                     hide(ellipsis[1], '');
-                    setPageNumbers(page - Math.floor(max / 2 / 2));
+                    setPageNumbers(page - (Math.ceil(max/2-1) - 1));
                 } else if (showPages === 'start') {
                     hide(ellipsis[0]);
                     hide(ellipsis[1], '');
