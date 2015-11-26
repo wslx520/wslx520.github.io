@@ -1,0 +1,423 @@
+.sz (@width, @height) {
+    width:@width;
+    height: @height;
+}
+.s32 {
+    width: 32px;
+    height: 32px;
+}
+.s24 {
+    width: 24px;
+    height: 24px;
+}
+.s16 {
+    width: 16px;
+    height: 16px;
+}
+.s14 {
+    width: 14px;
+    height: 14px;
+}
+.s10 {
+    width: 10px;
+    height: 10px;
+}
+.s8 {
+    width: 8px;
+    height: 8px;
+}
+i.i {
+    background-image: url(img/sprite@1x.png);
+    background-image: -webkit-image-set(url(img/sprite@1x.png) 1x, url(img/sprite@2x.png) 2x);
+    background-image: -moz-image-set(url(img/sprite@1x.png) 1x, url(img/sprite@2x.png) 2x);
+    background-image: -ms-image-set(url(img/sprite@1x.png) 1x, url(img/sprite@2x.png) 2x);
+    background-image: -o-image-set(url(img/sprite@1x.png) 1x, url(img/sprite@2x.png) 2x);
+    background-image: image-set(url(img/sprite@1x.png) 1x, url(img/sprite@2x.png) 2x);
+    background-repeat: no-repeat;
+    _background-image: url(../css/img/sprite@1x.png);
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+
+&.icon_like {
+    background-position: 0 0;
+    .s16();
+    &:hover {
+        background-position:0 -16px;
+    }
+}
+&.icon_like_hover {
+    background-position:0 -16px;
+}
+&.icon_like_active {
+    background-position:0 -32px;
+}
+&.icon_comment {
+    background-position: -16px 0;
+    .s16();
+    &:hover {
+        background-position:-16px -16px;
+    }
+}
+&.icon_comment_hover {
+    background-position:-16px -16px;
+}
+&.icon_comment_active {
+    background-position:-16px -32px;
+}
+
+&.icon_share {
+    background-position: -32px 0;
+    .s16();
+    &:hover {
+        background-position:-32px -16px;
+    }
+}
+&.icon_share_hover {
+    background-position:-32px -16px;
+}
+&.icon_share_active {
+    background-position:-32px -32px;
+}
+&.icon_listarrow {
+    background-position: -48px 0;
+    .s16();
+    &:hover {
+        background-position:-48px -16px;
+    }
+}
+&.icon_listarrow_hover {
+    background-position:-48px -16px;
+}
+
+&.icon_camera {
+    background-position: -64px 0;
+    .s16();
+    &:hover {
+        background-position:-64px -16px;
+    }
+}
+&.icon_camera_hover {
+    background-position:-64px -16px;
+}
+
+&.icon_add_circle {
+    background-position: -80px 0;
+    .s16();
+    &:hover {
+        background-position:-80px -16px;
+    }
+}
+&.icon_add_circle_hover {
+    background-position:-80px -16px;
+}
+&.icon_qrcode {
+    background-position: -96px 0;
+    .s16();
+    &:hover {
+        background-position:-96px -16px;
+    }
+}
+&.icon_qrcode_hover {
+    background-position:-96px -16px;
+}
+&.icon_write {
+    background-position: -96px 0;
+    .s16();
+    &:hover {
+        background-position:-96px -16px;
+    }
+}
+&.icon_write_hover {
+    background-position:-96px -16px;
+}
+
+&.icon_write {
+    background-position: -112px 0;
+    .s16();
+    &:hover {
+        background-position:-112px -16px;
+    }
+}
+&.icon_write_hover {
+    background-position:-112px -16px;
+}
+
+&.icon_zoom {
+    background-position: -128px 0;
+    .s16();
+    &:hover {
+        background-position:-128px -16px;
+    }
+}
+&.icon_zoom_hover {
+    background-position:-128px -16px;
+}
+
+&.icon_email {
+    background-position: -144px 0;
+    .s16();
+    &:hover {
+        background-position:-144px -16px;
+    }
+}
+&.icon_email_hover {
+    background-position:-144px -16px;
+}
+
+&.icon_user1 {
+    background-position: -160px 0;
+    .s16();
+    &:hover {
+        background-position:-160px -16px;
+    }
+}
+&.icon_user1_hover {
+    background-position:-160px -16px;
+}
+
+&.icon_pwd1 {
+    background-position: -176px 0;
+    .s16();
+    &:hover {
+        background-position:-176px -16px;
+    }
+}
+&.icon_pwd1_hover {
+    background-position:-176px -16px;
+}
+/*前3行完成*/
+/* 4th row start */
+&.icon_vip {
+    background-position: 0 -48px;
+    .s16();
+}
+&.icon_ellipsis {
+    background-position: -16px -48px;
+    .s16();
+}
+&.icon_eye {
+    background-position: -32px -48px;
+    .s16();
+}
+&.icon_warning {
+    background-position: -48px -48px;
+    .s16();
+}
+&.icon_quote {
+    background-position: -64px -48px;
+    .s16();
+}
+&.icon_got {
+    background-position: -80px -48px;
+    .s16();
+}
+&.icon_checked {
+    background-position: -96px -48px;
+    .s16();
+}
+/* 4th row end */
+/* 5th row start */
+
+&.icon_tips {
+    background-position: 0 -64px;
+    .s8();
+}
+&.icon_contentarr {
+    background-position: -8px -64px;
+    .s8();
+    &:hover {
+        background-position:-8px -72px;
+    }
+}
+&.icon_contentarr_hover {
+    .s8();
+    background-position:-8px -72px;
+}
+&.icon_urllink {
+    background-position: -16px -64px;
+    .s8();
+    &:hover {
+        background-position:-16px -72px;
+    }
+}
+&.icon_urllink_hover {
+    .s8();
+    background-position:-16px -72px;
+}
+/* 5th row end */
+/* 6-7th row start */
+&.icon_nointerest {
+    background-position: 0 -80px;
+    .s14();
+    &:hover {
+        background-position: 0 -96px;
+    }
+}
+&.icon_nointerest_hover {
+    background-position: 0 -96px;
+    .s14();
+}
+&.icon_refresh {
+    background-position: -16px -80px;
+    .s14();
+    &:hover {
+        background-position: -16px -96px;
+    }
+}
+&.icon_refresh_hover {
+    background-position: -16px -96px;
+    .s14();
+}
+
+&.icon_arrdown {
+    background-position: -32px -80px;
+    .s14();
+}
+&.icon_arrup {
+    background-position: -32px -96px;
+    .s14();
+}
+&.icon_tipsad {
+    background-position: -48px -80px;
+    .s14();
+}
+/* 6-7th row end */
+/* 8-10th row start */
+
+/*这个图标位置不标准，要偏移,x-3,y-5*/
+&.icon_selectarr {
+    background-position: -3px -117px;
+    .s10();
+    &:hover {
+        background-position: -3px -133px;
+    }
+}
+&.icon_selectarr_hover {
+    background-position: -3px -133px;
+    .s10();
+}
+&.icon_selectarr_disable {
+    background-position: -3px -149px;
+    .s10();
+}
+
+&.icon_xx {
+    background-position: -16px -112px;
+    .s10();
+    &:hover {
+        background-position: -16px -128px;
+    }
+}
+&.icon_xx_hover {
+    background-position: -16px -128px;
+    .s10();
+}
+/* 8-10th row end */
+/* 11th row(sns) start */
+&.icon_sns_weibo {    
+    background-position: 0 -160px;
+    .s24();
+    &:hover {
+        background-position: 0 -192px;        
+    }
+}
+&.icon_sns_weibo_hover {    
+    background-position: 0 -192px;
+    .s24();
+}
+&.icon_sns_weix {    
+    background-position: -32px -160px;
+    .s24();
+    &:hover {
+        background-position: -32px -192px;        
+    }
+}
+&.icon_sns_weix_hover {    
+    background-position: -32px -192px;
+    .s24();
+}
+&.icon_sns_qzone {    
+    background-position: -64px -160px;
+    .s24();
+    &:hover {
+        background-position: -64px -192px;        
+    }
+}
+&.icon_sns_qzone_hover {    
+    background-position: -64px -192px;
+    .s24();
+}
+&.icon_sns_fb {    
+    background-position: -96px -160px;
+    .s24();
+    &:hover {
+        background-position: -96px -192px;        
+    }
+}
+&.icon_sns_fb_hover {    
+    background-position: -96px -192px;
+    .s24();
+}
+&.icon_sns_tt {    
+    background-position: -128px -160px;
+    .s24();
+    &:hover {
+        background-position: -128px -192px;        
+    }
+}
+&.icon_sns_tt_hover {    
+    background-position: -128px -192px;
+    .s24();
+}
+&.icon_sns_qq {    
+    background-position: -160px -160px;
+    .s24();
+    &:hover {
+        background-position: -160px -192px;        
+    }
+}
+&.icon_sns_qq_hover {    
+    background-position: -160px -192px;
+    .s24();
+}
+/* 11th row end */
+/* 12th row start */
+
+&.icon_ecircle {    
+    background-position: 0 -224px;
+    .s24();
+}
+&.icon_bigerror {    
+    background-position: -32px -224px;
+    .s24();
+}
+/* 12th row end */
+
+/* 13th row start */
+&.icon_face_good {    
+    background-position: 0 -256px;
+    .s32();
+}
+&.icon_face_bad {    
+    background-position: -32px -256px;
+    .s32();
+}
+/* 13th row end */
+
+/* 14th row start */
+&.icon_home_icon1 {    
+    background-position: 0 -288px;
+    .sz(100px,100px)
+}
+&.icon_home_icon2 {    
+    background-position: -112px -288px;
+    .sz(100px,100px)
+}
+&.icon_home_icon3 {    
+    background-position: -224px -288px;
+    .sz(100px,100px)
+}
+/* 14th row end */
+
+}
