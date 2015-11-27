@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>实时监听输入</title>
+</head>
+<body>
+实时监听输入 <br />
+    <input type="text" value="输入输入" name="" id="input" />
+</body>
+<script>
+    function checkinput (input, fn) {
+         
+        if(window.addEventListener) { //先执行W3C
+          input.addEventListener("input", fn, false);
+        } else {
+          input.attachEvent("onpropertychange",fn);         
+        }
+         
+        if(window.VBArray && window.addEventListener) { //IE9
+          input.attachEvent("onkeydown", function() {
+            var key = window.event.keyCode;
+            (key == 8 || key == 46) && fn();//处理回退与删除         
+          });
+          input.attachEvent("oncut", fn);//处理粘贴
+        }
+    }
+    checkinput(document.getElementById('input'), function (e) {
+        e = e || window.event;
+        var target = e.target || e.srcElement;
+        console.log(target.tagName, target.value)
+    })
+</script>
+</html>
