@@ -62,9 +62,13 @@ i.i.icon_like:hover {
   background-position: 0 -16px;
 }
 i.i.icon_like_hover {
+  width: 16px;
+  height: 16px;
   background-position: 0 -16px;
 }
 i.i.icon_like_active {
+  width: 16px;
+  height: 16px;
   background-position: 0 -32px;
 }
 i.i.icon_comment {
@@ -76,9 +80,13 @@ i.i.icon_comment:hover {
   background-position: -16px -16px;
 }
 i.i.icon_comment_hover {
+  width: 16px;
+  height: 16px;
   background-position: -16px -16px;
 }
 i.i.icon_comment_active {
+  width: 16px;
+  height: 16px;
   background-position: -16px -32px;
 }
 i.i.icon_share {
@@ -90,9 +98,13 @@ i.i.icon_share:hover {
   background-position: -32px -16px;
 }
 i.i.icon_share_hover {
+  width: 16px;
+  height: 16px;
   background-position: -32px -16px;
 }
 i.i.icon_share_active {
+  width: 16px;
+  height: 16px;
   background-position: -32px -32px;
 }
 i.i.icon_listarrow {
@@ -104,6 +116,8 @@ i.i.icon_listarrow:hover {
   background-position: -48px -16px;
 }
 i.i.icon_listarrow_hover {
+  width: 16px;
+  height: 16px;
   background-position: -48px -16px;
 }
 i.i.icon_camera {
@@ -115,6 +129,8 @@ i.i.icon_camera:hover {
   background-position: -64px -16px;
 }
 i.i.icon_camera_hover {
+  width: 16px;
+  height: 16px;
   background-position: -64px -16px;
 }
 i.i.icon_add_circle {
@@ -126,6 +142,8 @@ i.i.icon_add_circle:hover {
   background-position: -80px -16px;
 }
 i.i.icon_add_circle_hover {
+  width: 16px;
+  height: 16px;
   background-position: -80px -16px;
 }
 i.i.icon_qrcode {
@@ -137,6 +155,8 @@ i.i.icon_qrcode:hover {
   background-position: -96px -16px;
 }
 i.i.icon_qrcode_hover {
+  width: 16px;
+  height: 16px;
   background-position: -96px -16px;
 }
 i.i.icon_write {
@@ -148,6 +168,8 @@ i.i.icon_write:hover {
   background-position: -96px -16px;
 }
 i.i.icon_write_hover {
+  width: 16px;
+  height: 16px;
   background-position: -96px -16px;
 }
 i.i.icon_write {
@@ -159,6 +181,8 @@ i.i.icon_write:hover {
   background-position: -112px -16px;
 }
 i.i.icon_write_hover {
+  width: 16px;
+  height: 16px;
   background-position: -112px -16px;
 }
 i.i.icon_zoom {
@@ -170,6 +194,8 @@ i.i.icon_zoom:hover {
   background-position: -128px -16px;
 }
 i.i.icon_zoom_hover {
+  width: 16px;
+  height: 16px;
   background-position: -128px -16px;
 }
 i.i.icon_email {
@@ -181,6 +207,8 @@ i.i.icon_email:hover {
   background-position: -144px -16px;
 }
 i.i.icon_email_hover {
+  width: 16px;
+  height: 16px;
   background-position: -144px -16px;
 }
 i.i.icon_user1 {
@@ -192,6 +220,8 @@ i.i.icon_user1:hover {
   background-position: -160px -16px;
 }
 i.i.icon_user1_hover {
+  width: 16px;
+  height: 16px;
   background-position: -160px -16px;
 }
 i.i.icon_pwd1 {
@@ -203,6 +233,8 @@ i.i.icon_pwd1:hover {
   background-position: -176px -16px;
 }
 i.i.icon_pwd1_hover {
+  width: 16px;
+  height: 16px;
   background-position: -176px -16px;
 }
 i.i.icon_vip {
