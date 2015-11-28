@@ -160,19 +160,6 @@ i.i.icon_qrcode_hover {
   background-position: -96px -16px;
 }
 i.i.icon_write {
-  background-position: -96px 0;
-  width: 16px;
-  height: 16px;
-}
-i.i.icon_write:hover {
-  background-position: -96px -16px;
-}
-i.i.icon_write_hover {
-  width: 16px;
-  height: 16px;
-  background-position: -96px -16px;
-}
-i.i.icon_write {
   background-position: -112px 0;
   width: 16px;
   height: 16px;
