@@ -11,9 +11,9 @@ info : 是否显示页码信息，默认true，会加入一个page-text用来显
 jump : 是否允许输入页码跳页，默认true,会加入一个页码输入框和确定按钮
 prev ：上一页按钮显示的文字，设为false则不显示上一页按钮，下同
 next ：下一页按钮显示的文字，同上
-last ：末页按钮显示的文字，同上
-first ：首页按钮显示的文字，同上
-
+last ：末页按钮显示的文字，同上；默认false
+first ：首页按钮显示的文字，同上；默认false
+showSize : 是否显示左侧的切换每页多少条，默认false。如果设为true，则会显示当前页码分别乘以1,2,3的size切换；如果设为一个数组如[20,40,80]，则会以此数组生成对应的size切换
 属性：
 options : 对象，上面列出的静态设置选项
 currPageElement : 当前页码的node
@@ -220,13 +220,22 @@ var xPagination = function (doc) {
                 root.ellipsis.push(root.pageList.splice(-2, 1)[0]);    
             }            
             if(Options.onpagination) root.onpagination = Options.onpagination;
-            if (Options.size) {
+            if (Options.showSize) {
                 Options.size -= 0;
                 var ul = create('page-list page-size', 'ul'),
-                    sizes = {15: 0,30: 1,50: 2};
-                ul.innerHTML = '<li class="page-item">15</li><li class="page-item">30</li><li class="page-item">50</li>';
+                    sizesIndex = {},
+                    sizes = Options.showSize,
+                    allLis = '';
+                if(!sizes.splice) {
+                    sizes = [Options.size, Options.size*2, Options.size*3 ]
+                }    
+                for(var a = 0;a<sizes.length;a++) {
+                    allLis += '<li class="page-item">'+sizes[a]+'</li>';
+                    sizesIndex[sizes[a]] = a;
+                }
+                ul.innerHTML = allLis;
                 temp.insertBefore(ul, el);
-                addClass(ul.children[sizes[Options.size]], pageHover);
+                addClass(ul.children[sizesIndex[Options.size]], pageHover);
                 ul.onclick = function (event) {
                 	event = event || window.event;
                 	target = event.target || event.srcElement;
@@ -296,6 +305,13 @@ var xPagination = function (doc) {
             };
             root.go(Options.curr);
         };
+        Pagination.prototype.init = function (options) {
+            if(options) {
+                extend(this.options, options);
+            }
+            options = this.options;
+            
+        }
         Pagination.prototype.go = function (page) {
             var root = this,
                 pageList = root.pageList,

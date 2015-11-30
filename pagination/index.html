@@ -19,30 +19,43 @@
 </p>
 <p>
 	<b>options参数说明：</b><br />
-max : 最多同时显示好多页，默认8 <br />
-curr : 当前页码，默认1<br />
+支持设置的选项： <br />
+max : 最多同时显示好多页<br />
+curr : 当前页码<br />
 size : 每页显示多少条，默认15。可以是15,30,50的任一个，如果传为false，则不显示切换每页显示条数的标签<br />
-pages : 总好多页。必有，但可以不传而只传items，则会由items和size计算出pages<br />
-items : 总数据条数。如果pages不传，则items必传<br />
-onpagination : 函数，在页码跳转时触发，此函数执行时会自动传入两个参数：page（当前页）, size（当前页显示条数），如果此函数返回false，则不会发生跳页<br />
+pages : 总好多页。可以不传而只传items，则会由items和size计算出pages<br />
+items : 总数据条数。<br />
+onpagination : 函数，在页码跳转时触发，此函数执行时会自动传入两个参数：page（当前页）, size（当前页显示条数）<br />
 info : 是否显示页码信息，默认true，会加入一个page-text用来显示“共N页，当前是第n页”这样的信息<br />
 jump : 是否允许输入页码跳页，默认true,会加入一个页码输入框和确定按钮<br />
 prev ：上一页按钮显示的文字，设为false则不显示上一页按钮，下同<br />
 next ：下一页按钮显示的文字，同上<br />
-last ：末页按钮显示的文字，同上<br />
-first ：首页按钮显示的文字，同上<br />
+last ：末页按钮显示的文字，同上；默认false<br />
+first ：首页按钮显示的文字，同上；默认false<br />
+showSize : 是否显示左侧的切换每页多少条，默认false。如果设为true，则会显示当前页码分别乘以1,2,3的size切换；如果设为一个数组如[20,40,80]，则会以此数组生成对应的size切换
 </p>
+
+<h2>xPagination实例的属性：</h2>
+<p>
+    options : 对象，上面列出的静态设置选项 <br />
+currPageElement : 当前页码的node<br />
+pageList : Node数组，页码node的列表<br />
+</p>
+
 <div id="pagediv"></div>
 <br />
 <div id="pagediv1"></div>
 <br />
 <div id="pagediv2"></div>
+<br />
+<div id="pagediv3"></div>
 
 <script src="xpagination.js" type="text/javascript"></script>
 <script>	
 var pagediv = document.getElementById('pagediv');
 var pagediv1 = document.getElementById('pagediv1');
 var pagediv2 = document.getElementById('pagediv2');
+var pagediv3 = document.getElementById('pagediv3');
 
 var pagenav = xPagination(pagediv, {
     max:8,
@@ -52,6 +65,7 @@ var pagenav = xPagination(pagediv, {
     first:false,
     last:false,
     jump:true,
+    showSize:[15,30,50],
     onpagination: function  (page, size) {
         console.log(page, size)
     }
@@ -64,6 +78,7 @@ var pagenav1 = xPagination(pagediv1, {
     first:false,
     last:false,
     jump:true,
+    showSize:true,
     onpagination: function  (page, size) {
         console.log(page, size)
     }
@@ -72,12 +87,25 @@ var pagenav2 = xPagination(pagediv2, {
     max:10,
     curr:1,
     size:30,
+    items:2222,
+    first:false,
+    last:false,
+    jump:false,
+    onpagination: function  (page, size) {
+        console.log(page, size)
+    }
+})
+var pagenav3 = xPagination(pagediv3, {
+    max:10,
+    curr:1,
+    size:10,
     items:22,
     first:false,
     last:false,
-    jump:true,
+    jump:false,
+    showSize: [10,30,50],
     onpagination: function  (page, size) {
-        console.log(page, size)
+        console.log('p3', page, size)
     }
 })
 // pagenav.go(10)
