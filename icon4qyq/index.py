@@ -19,7 +19,7 @@ try:
     <title>icons 4 qyq</title>
     <link rel="stylesheet" href="icon.css" />
 </head>
-<body>
+<body style="background-color: #C8C8C8;">
 
 """+allclasses+'</body></html>';
         html.write(codes);

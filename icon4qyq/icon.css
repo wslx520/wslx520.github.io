@@ -321,13 +321,29 @@ i.i.icon_arrdown {
   width: 14px;
   height: 14px;
 }
-i.i.icon_arrup {
+i.i.icon_arrdown:hover {
+  background-position: -32px -96px;
+}
+i.i.icon_arrdown_hover {
   background-position: -32px -96px;
   width: 14px;
   height: 14px;
 }
-i.i.icon_tipsad {
+i.i.icon_arrup {
   background-position: -48px -80px;
+  width: 14px;
+  height: 14px;
+}
+i.i.icon_arrup:hover {
+  background-position: -48px -96px;
+}
+i.i.icon_arrup_hover {
+  background-position: -48px -96px;
+  width: 14px;
+  height: 14px;
+}
+i.i.icon_tipsad {
+  background-position: -64px -80px;
   width: 14px;
   height: 14px;
 }
