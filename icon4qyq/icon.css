@@ -47,6 +47,7 @@ i.i {
   /* 11th row(sns) start */
   /* 11th row end */
   /* 12th row start */
+  /*12.1图片作了修改，需要偏移*/
   /* 12th row end */
   /* 13th row start */
   /* 13th row end */
@@ -462,7 +463,7 @@ i.i.icon_ecircle {
   height: 24px;
 }
 i.i.icon_bigerror {
-  background-position: -32px -224px;
+  background-position: -204px -172px;
   width: 24px;
   height: 24px;
 }
