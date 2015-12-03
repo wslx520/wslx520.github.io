@@ -14,6 +14,11 @@
 <BODY>
 <h1>DoDom，jquery式的操作dom</h1>
 <p>实现代码较简单，封装程序不高。</p>
+<div id="div" class="a b c d div">一个div</div>
 <script src="DD.js"></script>
+<script>
+    console.log(dd($('#div')).addClass('bb b').removeClass('b').toggleClass('a b').hasClass('div'))
+
+</script>
 </BODY>
 </HTML>
