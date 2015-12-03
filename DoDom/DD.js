@@ -26,7 +26,8 @@ DD = dd = function (doc) {
 	},
     // 只支持判断单个class
 	hasClass = function (elm,cls) {
-        return ' '+elm.className+' '.indexOf(' '+cls+' ') !== -1;
+		console.log(' '+elm.className+' ', ' '+cls+' ')
+        return (' '+elm.className+' ').indexOf(' '+cls+' ') !== -1;
 	},
 	removeClass = function (elm,cls) {
         cls = splitString(cls);
@@ -40,6 +41,11 @@ DD = dd = function (doc) {
     };
     function DoDom (nodes) {
         this.nodes = nodes.tagName && nodes.nodeName ? [nodes] : nodes;
+    }
+    function nodesLoop (nodes, fn) {
+    	for(var n = 0,  node;node = nodes[n++];) {
+            fn(node, n);
+        }
     }
     DoDom.prototype = {
         hasClass: function (clses) {
@@ -63,14 +69,15 @@ DD = dd = function (doc) {
 
 		addClass : function (clses) {
             clses = splitString(clses);
-            var nodes = this.nodes, cl = clses.length;			
-            for(var n = 0,  node, c;node = nodes[n++];) {
-                for(c = cl;c--;) {
+            var c = cl = clses.length;	
+            nodesLoop(this.nodes, function (node) {
+            	for(c = cl;c--;) {
+            		console.log(c,clses[c])
                     if(!hasClass(node,clses[c])) {
                         addClass(node, clses[c]);
                     }
                 }
-            }           
+            })		       
             return this;
 		},
 		removeClass : function (clses) {              
@@ -93,10 +100,7 @@ DD = dd = function (doc) {
             return this;
 		},
         remove: function () {
-            var nodes = this.nodes;          
-            for(var n = 0,  node;node = nodes[n++];) {
-                remove(node)
-            }
+            nodesLoop(this.nodes, remove);
         }
     }
     DoDom.contains = doc.body.contains ? function (par,chi) {
