@@ -47,7 +47,7 @@ i.i {
   /* 11th row(sns) start */
   /* 11th row end */
   /* 12th row start */
-  /*12.1图片作了修改，需要偏移*/
+  /*12.1图片作了修改，需要偏移，左上角位置是：-192,-160.图标绝对位置是各-12*/
   /* 12th row end */
   /* 13th row start */
   /* 13th row end */
@@ -378,6 +378,26 @@ i.i.icon_xx_hover {
   background-position: -16px -128px;
   width: 10px;
   height: 10px;
+}
+i.i.icon_pic_slideup {
+  background-position: -32px -112px;
+  width: 18px;
+  height: 18px;
+}
+i.i.icon_pic_source {
+  background-position: -56px -112px;
+  width: 18px;
+  height: 18px;
+}
+i.i.icon_pic_prev {
+  background-position: -80px -112px;
+  width: 10px;
+  height: 16px;
+}
+i.i.icon_pic_next {
+  background-position: -96px -112px;
+  width: 10px;
+  height: 16px;
 }
 i.i.icon_sns_weibo {
   background-position: 0 -160px;
