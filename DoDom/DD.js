@@ -7,7 +7,7 @@ var dd,
         return document.querySelectorAll(s)
     },
     // 正式函数开始
-    DD = dd = function(doc) {
+    DD = dd = function(doc, undef) {
         var
             html = doc.documentElement,
             blank = /\s+/,
@@ -20,6 +20,9 @@ var dd,
             },
             trim = function(str) {
                 return str.replace(/^\s+/, '').replace(/\s+$/, '');
+            },
+            isString = function (o) {
+            	return 'string' === typeof o;
             },
             // 字符串拆成数组
             splitString = function(clses) {
@@ -43,6 +46,33 @@ var dd,
             },
             remove = function(elem) {
                 elem.parentNode.removeChild(elem);
+            },
+            getAttr = function (elem, attrname) {
+            	return elem.getAttribute(attrname);
+            },
+            setAttr = function (elem, attr, val) {
+            	elem.setAttribute(attr, val);
+            },
+            setAttrs = function (elem, attrs) {
+            	for(var a in attrs) {
+            		setAttr(elem, a, attrs[a]);
+            	}
+            },
+            setProp = function (elem, prop, val) {
+            	elem[prop] = val;
+            },
+            setProps = function (elem, props) {
+            	for(var a in props) {
+            		setProp(elem, a, props[a]);
+            	}
+            },
+            getText = if(tempEl.innerText !== undef) ? function (elem) {
+            	return elem.innerText;
+            } : function (elem) {
+            	return elem.textContent;
+            },
+            setText = function (elem, txt) {
+            	elem.innerText = elem.textContent =  txt;
             },
             addEvent = doc.addEventListener ? function(el, type, handler) {
                 el.addEventListener(type, handler, false);
@@ -177,10 +207,12 @@ var dd,
                 }
             }(),
             closest = function(elm, fn, fina) {
-                var isstring = typeof fn === 'string',
-                    html = doc.documentElement,
+                var isstring = isString(fn),
                     body = doc.body;
-                while (elm !== fina && elm !== body && elm != html) {
+                while (elm) {
+                	if(elm === fina || elm === body || elm === html) {
+                		break;
+                	}
                     if (isstring) {
                         if (is(elm, fn)) return elm;
                     } else {
@@ -396,6 +428,51 @@ var dd,
                     allSiblings = allSiblings.concat(getSiblings(node));
                 });
                 return nodesUniq(allSiblings);
+            },
+            removeAttr: function (attrname) {
+            	nodesLoop(this.nodes, function (node) {
+            		node.removeAttribute(attrname)
+            	})
+            },
+            attr: function (name, val) {
+            	var temp;
+            	if(isString(name)) {
+            		if(val === undef) { 
+            			return getAttr(this.nodes[0], name);
+            		}
+            		temp = setAttr;
+            	} else {
+            		temp = setAttrs;
+            	}            	
+            	nodesLoop(this.nodes, function (node) {
+            		temp(node, name, val);
+            	})
+            },
+            prop: function (name, val) {
+            	var temp;
+            	if(isString(name)) {
+            		if(val === undef) {
+            			return this.nodes[0][name];
+            		}
+            		temp = setProp;
+            	} else {
+            		temp = setProps;
+            	}
+            	nodesLoop(this.nodes, function (node) {
+            		temp(node, name, val);
+            	})
+            },
+            text: function (txt) {
+            	if(txt === undef) return getText(this.nodes[0]);
+            	nodesLoop(this.nodes, function (node) {
+            		setText(node, txt);
+            	})
+            },
+            html: function (html) {
+            	if(html === undef) return this.nodes[0].innerHTML;
+            	nodesLoop(this.nodes, function (node) {
+            		node.innerHTML = html;
+            	})
             }
         }
         DoDom.contains = doc.body.contains ? function(par, chi) {
