@@ -309,6 +309,7 @@ var dd,
 
         function DoDom(nodes) {
             this.nodes = nodes.tagName && nodes.nodeName ? [nodes] : nodes;
+            this.length = this.nodes.length;
         }
 
         function nodesLoop(nodes, fn) {
@@ -473,6 +474,30 @@ var dd,
             	nodesLoop(this.nodes, function (node) {
             		node.innerHTML = html;
             	})
+            },
+            each: function (fn) {
+            	nodesLoop(this.nodes, fn);
+            },
+            index: function (elem) {
+            	if(elem) {
+            		for(var n=0,node, nodes = this.nodes;node = nodes[n++];) {
+            			if(node === elem) {
+            				return n-1;
+            			}
+            		}
+            		return -1;
+            	}
+            	node = this.nodes[0];
+            	var siblings = node.parentNode.chilren, sl = siblings.length, s= 0;
+            	for(; s< sl; s++) {
+            		if(siblings[s] === node) {
+            			return s;
+            		}
+            	}
+            	return -1;
+            },
+            get: function (i) {
+            	return i===undef ? this.nodes : this.nodes[i];
             }
         }
         DoDom.contains = doc.body.contains ? function(par, chi) {
