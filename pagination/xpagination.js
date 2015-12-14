@@ -11,8 +11,8 @@ info : 是否显示页码信息，默认true，会加入一个page-text用来显
 jump : 是否允许输入页码跳页，默认true,会加入一个页码输入框和确定按钮
 prev ：上一页按钮显示的文字，设为false则不显示上一页按钮，下同
 next ：下一页按钮显示的文字，同上
-last ：末页按钮显示的文字，同上；默认false
-first ：首页按钮显示的文字，同上；默认false
+last ：末页按钮显示的文字，同上；默认false (2015/12/14 去掉此选项，因为页码算法的改变，页码在任何时候，都会显示第一页和最后一页的页码，用不着用按钮来跳了)
+first ：首页按钮显示的文字，同上；默认false (2015/12/14 去掉此选项)
 showSize : 是否显示左侧的切换每页多少条，默认false。如果设为true，则会显示当前页码分别乘以1,2,3的size切换；如果设为一个数组如[20,40,80]，则会以此数组生成对应的size切换
 属性：
 options : 对象，上面列出的静态设置选项
@@ -49,8 +49,6 @@ var xPagination = function (doc) {
         defaults = {
             prev: '&lt;',
             next: '&gt;',
-            last: false,
-            first: false,
             size: 15,
             max: 8,
             pages: 0,
@@ -140,8 +138,6 @@ var xPagination = function (doc) {
                 pageList,
                 elli,
                 pageCodes = {
-                    first: 1,
-                    last: pages,
                     next: function () {
                         return Options.curr >= pages ? pages : Options.curr + 1;
                     },
@@ -149,76 +145,15 @@ var xPagination = function (doc) {
                         return Options.curr <= 1 ? 1 : Options.curr - 1;
                     }
                 };
-            if (pages === 0) {
-                pages = Options.pages = Math.ceil(Options.items / Options.size);
-            }
             temp = el;
-            if (el.tagName === 'UL') {
-                var div = create('page-list-wrap');
-                el.parentNode.replaceChild(el, div);
-                div.appendChild(temp);
-                temp = div;
-            } else {
-                el = create('page-list', 'UL');
-                temp.appendChild(el);
-                if(!hasClass(temp, 'page-list-wrap')) {
-                	addClass(temp, 'page-list-wrap');
-                }
+            el = create('page-list', 'UL');
+            temp.appendChild(el);
+            if(!hasClass(temp, 'page-list-wrap')) {
+            	addClass(temp, 'page-list-wrap');
             }
-            if (Options.first) {
-                plStart += 1;
-                items.push('<li class="' + pageItem + '" ui-page="first">' + Options.first + '</li>');
-            }
-            if (Options.prev) {
-                plStart += 1;
-                items.push('<li class="page-btn-prev" ui-page="prev">' + Options.prev + '</li>');
-            }
-            // items.push('<li class="' + pageItem +'" ui-page="1">1</li>');
-            start = pageCalc(curr, pages, max);
-            end = start + (max - 1);
-            if (end > pages) {
-                end = pages;
-            }
-            pageList = [];
-            /*for (var i = start; i <= end; i = i + 1) {
-                pa = curr === i ? ' ' + pageActive : '';
-                pageList.push('<li class="' + pageItem + pa + '" ui-page="' + i + '">' + i + '</li>');
-            }*/
-            max = Math.min(max, pages);
-            for (i = 1; i <= max; i++) {
-                pageList.push('<li class="' + pageItem + '" ui-page="' + i + '">' + i + '</li>');
-            }
-            if(pages > max) {
-                elli = '<li class="page-ellipsis" ui-page="ellipsis">...</li>';
-                pageList.splice(1, 0, elli);
-                pageList.splice(pageList.length - 1, 0, elli);
-                pageList[pageList.length - 1] = '<li class="' + pageItem + '" ui-page="' + pages + '">' + pages + '</li>';    
-            }
-            
-            items = items.concat(pageList);
-            noNext = (curr === pages || pages === 0) ? pageDisable : pageItem;
-            if (Options.next) {
-                plEnd += 1;
-                items.push('<li class="page-btn-next" ui-page="next">' + Options.next + '</li>');
-            }
-            if (Options.last) {
-                plEnd += 1;
-                items.push('<li class="last-page ' + noNext + '" ui-page="last">' + Options.last + '</li>');
-            }
-            // console.log(pageList, items);
-            el.innerHTML = items.join('');
-            root.pageList = function  () {
-                var l = el.children.length,i=0,res = [];
-                for(;plStart < l - plEnd;plStart++) {
-                    res.push(el.children[plStart]);
-                }
-                return res;
-            }();
-            // root.pageList = list.slice((root.hasEllipsis ? 3 : 2) - (Options.first ? 0 : 1) - (Options.prev ? 0 : 1), (root.hasEllipsis ? -3 : -2) + (Options.last ? 0 : 1) + (Options.next ? 0 : 1));
-            if(pages > max) {
-                root.ellipsis = root.pageList.splice(1, 1);
-                root.ellipsis.push(root.pageList.splice(-2, 1)[0]);    
-            }            
+            this.pageList = el;
+            // 生成页码
+            setPages.call(this);        
             if(Options.onpagination) root.onpagination = Options.onpagination;
             if (Options.showSize) {
                 Options.size -= 0;
@@ -254,20 +189,26 @@ var xPagination = function (doc) {
                 };
             }
             if (Options.info) {
+                if(!root.meta) {
+                    root.meta = el.parentNode.appendChild(create('page-list page-meta', 'ul'));
+                }
                 pi = create('page-text', 'li');
                 if (Options.items) {
                     pi.innerHTML = '共' + Options.items + '条';
                 } else {
                     pi.innerHTML = '共' + pages + '页';
                 }
-                root.info = el.appendChild(pi);
+                root.info = root.meta.appendChild(pi);
             }
             if (Options.jump) {
+                if(!root.meta) {
+                    root.meta = el.parentNode.appendChild(create('page-list page-meta', 'ul'));
+                }
                 jumpinput = create('page-text page-input', 'li');
                 jumpinput.innerHTML = '到第<span class="mid-helper"></span><input type="text" class="mid-text page-position">页';
                 jumpbt = create('page-btn', 'li');
                 jumpbt.innerHTML = '<button>确定</button>';
-                el.appendChild(jumpinput);
+                root.meta.appendChild(jumpinput);
                 jumpinput.onkeydown = function (e) {
                     e = core.wrapEvent(e);
                     var input = this.getElementsByTagName('input')[0],
@@ -276,7 +217,7 @@ var xPagination = function (doc) {
                         root.go(+value);
                     }
                 };
-                root.jump = el.appendChild(jumpbt);
+                root.jump = root.meta.appendChild(jumpbt);
                 root.jump.onclick = function () {
                     page = this.previousSibling.getElementsByTagName('input')[0].value;
                     if (!isNaN(+page)  && page !== '') {
@@ -305,16 +246,70 @@ var xPagination = function (doc) {
             };
             root.go(Options.curr);
         };
-        Pagination.prototype.init = function (options) {
-            if(options) {
-                extend(this.options, options);
+        function setPages() {
+            var root = this,
+                Options = root.options,
+                pages = Options.pages-=0,
+                curr = Options.curr-=0,
+                max = Options.max-=0,
+                temp,
+                items = [],
+                start,
+                end,
+                pi,
+                jumpinput,
+                jumpbt,
+                noNext,
+                list,
+                pp,
+                page,
+                target,
+                li,
+                plStart = 0,
+                plEnd = 0,
+                i,
+                pageList,
+                elli;
+            if (pages === 0) {
+                pages = Options.pages = Math.ceil(Options.items / Options.size);
             }
-            options = this.options;
+            this.pageList.innerHTML = '';
+            // items.push('<li class="' + pageItem +'" ui-page="1">1</li>');
+            // start = pageCalc(curr, pages, max);
+            // end = start + (max - 1);
+            // if (end > pages) {
+            //     end = pages;
+            // }
+            max = Math.min(max, pages);
+            for (i = 1; i <= max; i++) {
+                items.push('<li class="' + pageItem + '" ui-page="' + i + '">' + i + '</li>');
+            }
+            if(pages > max) {
+                elli = '<li class="page-ellipsis" ui-page="ellipsis">...</li>';
+                items.splice(1, 0, elli);
+                items.splice(items.length - 1, 0, elli);
+                items[items.length - 1] = '<li class="' + pageItem + '" ui-page="' + pages + '">' + pages + '</li>';    
+            }
+            
+            if (Options.prev) {
+                plStart += 1;
+                items.unshift('<li class="page-btn-prev" ui-page="prev">' + Options.prev + '</li>');
+            }
+            if (Options.next) {
+                plEnd += 1;
+                items.push('<li class="page-btn-next" ui-page="next">' + Options.next + '</li>');
+            }
+            // console.log(pageList, items);
+            this.pageList.innerHTML = items.join('');
+            if(pages > max) {
+                root.ellipsis = [root.pageList.children[Options.prev ? 2 : 1]];
+                root.ellipsis.push(root.pageList.children[root.pageList.children.length - (Options.next ? 2 : 1)]);    
+            }    
             
         }
         Pagination.prototype.go = function (page) {
             var root = this,
-                pageList = root.pageList,
+                pageList = root.pageList.children,
                 ellipsis = root.ellipsis,
                 pl = pageList.length,
                 Options = root.options,
@@ -325,8 +320,8 @@ var xPagination = function (doc) {
                 i,
                 num,
                 showPages = 'center',
-                prev = pageList[0].previousSibling,
-                next = pageList[pl - 1].nextSibling;
+                prev = Options.prev ? pageList[0] : null,
+                next = Options.next ? pageList[pl - 1].nextSibling : null;
             // 容错。防止有人通过JS直接跳转不存在的页
             page = page > Options.pages ? Options.pages : (page < 1 ? 1 : page);
             Options.curr = page;
@@ -345,15 +340,20 @@ var xPagination = function (doc) {
                 if (start > pages - max + 1) {
                     start = pages - max + 2;
                 }
-                // console.log(start);
-                for (i = 1; i < pl - 1; i++) {
+
+                console.log(start, pl);
+                for (i = 0; i < pl - 1; i++) {
                     li = pageList[i];
-                    num = start + i - 1;
-                    li.innerHTML = num;
-                    li.setAttribute('ui-page', num);
-                    if (num === page) {
-                        setActive(li);
-                    }
+                    console.log(li)
+                    if(/\d+/.test(li.getAttribute('ui-page'))) {
+                        num = start;
+                        li.innerHTML = num;
+                        li.setAttribute('ui-page', num);
+                        if (num === page) {
+                            setActive(li);
+                        }   
+                        start++; 
+                    }                    
                 }
             }
             // console.log(start,page)
@@ -374,7 +374,7 @@ var xPagination = function (doc) {
                 } else if (showPages === 'start') {
                     hide(ellipsis[0]);
                     hide(ellipsis[1], '');
-                    setPageNumbers(2);
+                    setPageNumbers(1);
                 } else {
                     hide(ellipsis[0], '');
                     hide(ellipsis[1]);
@@ -384,15 +384,15 @@ var xPagination = function (doc) {
 
             if (page === 1) {
                 setActive(pageList[0]);
-                addClass(prev, pageDisable);
+                prev && addClass(prev, pageDisable);
             } else {
-                removeClass(prev, pageDisable);
+                prev && removeClass(prev, pageDisable);
             }
             if (page === pages) {
                 setActive(pageList[pl - 1]);
-                addClass(next, pageDisable);
+                next && addClass(next, pageDisable);
             } else {
-                removeClass(next, pageDisable);
+                next && removeClass(next, pageDisable);
             }
             if (root.jump) {
                 root.jump.previousSibling.getElementsByTagName('input')[0].value = page;
