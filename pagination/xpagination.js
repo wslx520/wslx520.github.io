@@ -264,7 +264,7 @@ var xPagination = function (doc) {
                 first = pageList.first, 
                 last = pageList.last,
                 prev = Options.prev;
-            console.log(page)    
+            // console.log(page)    
             // 容错。防止有人通过JS直接跳转不存在的页
             page = page > Options.pages ? Options.pages : (page < 1 ? 1 : page);
             Options.curr = page;
