@@ -10,7 +10,8 @@
 <p>
     版本号：1.0 <br />
     更新日期：2015-11-11 <br />
-    作者：<a href="http://jo2.org">脚儿网</a> 
+    作者：<a href="http://jo2.org">脚儿网</a> <br />
+    说明：本页使用了console，请打开调试工具
 </p>
 <p>
 	<b>使用方法：</b><br />
@@ -22,34 +23,44 @@
 支持设置的选项： <br />
 max : 最多同时显示好多页<br />
 curr : 当前页码<br />
-size : 每页显示多少条，默认15。可以是15,30,50的任一个，如果传为false，则不显示切换每页显示条数的标签<br />
+size : <del>每页显示多少条，默认15。可以是15,30,50的任一个，如果传为false，则不显示切换每页显示条数的标签</del><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<b>2015.12.17</b>: 
+size可以传入任何数字，如果不传值或传为false，则默认是15; 且不再与是否显示条数切换功能有关 <br />
 pages : 总好多页。可以不传而只传items，则会由items和size计算出pages<br />
-items : 总数据条数。<br />
+items : 总数据条数<b>推荐</b>。使用这个参数，可以在切换每页显示条数时，动态修正页码数量<br />
 onpagination : 函数，在页码跳转时触发，此函数执行时会自动传入两个参数：page（当前页）, size（当前页显示条数）<br />
 info : 是否显示页码信息，默认true，会加入一个page-text用来显示“共N页，当前是第n页”这样的信息<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<b>2015.12.17</b>: 新增功能，info可以是一个函数，此函数会接收options做为参数，返回一个字符串，插入到info的div中，且每次翻页都会刷新。
+<br />
 jump : 是否允许输入页码跳页，默认true,会加入一个页码输入框和确定按钮<br />
 prev ：上一页按钮显示的文字，设为false则不显示上一页按钮，下同<br />
 next ：下一页按钮显示的文字，同上<br />
-last ：末页按钮显示的文字，同上；默认false<br />
-first ：首页按钮显示的文字，同上；默认false<br />
-showSize : 是否显示左侧的切换每页多少条，默认false。如果设为true，则会显示当前页码分别乘以1,2,3的size切换；如果设为一个数组如[20,40,80]，则会以此数组生成对应的size切换
+last ：末页按钮显示的文字，同上；默认false <i>(2015/12/14 去掉此选项，因为页码算法的改变，页码在任何时候，都会显示第一页和最后一页的页码，用不着用按钮来跳了)</i><br />
+first ：首页按钮显示的文字，同上；默认false <i>2015/12/14去除</i><br />
+showSize : <b>2015.12.17</b>是否显示左侧的切换每页多少条，默认false。如果设为true，则会显示当前页码分别乘以1,2,3的size切换；如果设为一个数组如[20,40,80]，则会以此数组生成对应的size切换
 </p>
 
 <h2>xPagination实例的属性：</h2>
 <p>
-    options : 对象，上面列出的静态设置选项 <br />
+options : 对象，上面列出的静态设置选项 <br />
 currPageElement : 当前页码的node<br />
 pageList : Node数组，页码node的列表<br />
 </p>
-
+<h3>示例：</h3>
+30/页，curr=2，max=8，info=true，jump=true，showSize为数组 <br />
 <div id="pagediv"></div>
 <br />
+max=7，showSize=true <br />
 <div id="pagediv1"></div>
 <br />
+showSize没传；max=10；curr=11；info为一个函数；jump=false：<br />
 <div id="pagediv2"></div>
 <br />
+没有上下页; showSize是个数组：<br />
 <div id="pagediv3"></div>
-
+注：切换每页显示条数后，页码会重新生成，然后会自动跳到当前页最接近的页
+<br />
+注：样式不满意请自定义
 <script src="xpagination.js" type="text/javascript"></script>
 <script>	
 var pagediv = document.getElementById('pagediv');
@@ -62,12 +73,10 @@ var pagenav = xPagination(pagediv, {
     curr:2,
     size:30,
     pages:22,
-    first:false,
-    last:false,
     jump:true,
     showSize:[15,30,50],
     onpagination: function  (page, size) {
-        console.log(page, size)
+        console.log('pagediv', page, size)
     }
 })
 var pagenav1 = xPagination(pagediv1, {
@@ -75,33 +84,34 @@ var pagenav1 = xPagination(pagediv1, {
     curr:1,
     size:15,
     items:586,
-    first:false,
-    last:false,
     jump:true,
     showSize:true,
     onpagination: function  (page, size) {
-        console.log(page, size)
+        console.log('pagediv1', page, size)
     }
 })
 var pagenav2 = xPagination(pagediv2, {
     max:10,
-    curr:1,
+    curr:11,
     size:30,
     items:2222,
     first:false,
     last:false,
     jump:false,
+    info: function (options) {
+        return '共'+options.items+'条，当前是'+((options.curr-1) * options.size)+'~'+(options.curr * options.size)+'条';
+    },
     onpagination: function  (page, size) {
-        console.log(page, size)
+        console.log('pagenav2', page, size)
     }
 })
 var pagenav3 = xPagination(pagediv3, {
     max:10,
     curr:1,
     size:10,
-    items:22,
-    first:false,
-    last:false,
+    items:36,
+    prev:false,
+    next:false,
     jump:false,
     showSize: [10,30,50],
     onpagination: function  (page, size) {

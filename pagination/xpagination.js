@@ -21,25 +21,16 @@ pageList : Node数组，页码node的列表
 */
 var xPagination = function (doc) {
     var hasClass = function (elm, cls) {
-            var c, ecls;
-            cls = cls.split(/\s+/);
-            for (c = cls.length, ecls = ' ' + elm.className + ' '; c--; ) {
-                if(ecls.indexOf(' '+cls[c]+' ') == -1) {
-                    return false;
-                }
-            }
-            return true;
+            var ecls = ' ' + elm.className + ' ';
+            return ecls.indexOf(' ' + cls + ' ') > -1;
         },
-        addClass = function (elm,cls) {
-            elm.className += ' '+cls;
+        addClass = function (elm, cls) {
+            elm.className += ' ' + cls;
         },
-        removeClass = function (elm,cls) {
-            cls = cls.split(/\s+/);
-            cls.forEach(function  (cc,i) {
-                elm.className = elm.className.replace(RegExp('\\b'+cc+'\\b',"g"),'');
-            })
+        removeClass = function (elm, cls) {
+            elm.className = elm.className.replace(new RegExp('\\b' + cls + '\\b', "g"), '');
         },
-        create = function  (classes, tag) {
+        create = function (classes, tag) {
             tag = tag || 'DIV';
             var elem = doc.createElement(tag);
             elem.className = classes;
@@ -65,8 +56,8 @@ var xPagination = function (doc) {
                 elm = elm.parentNode;
             }
         },
-        extend = function  (old,newo) {
-            for(var o in newo) {
+        extend = function (old, newo) {
+            for (var o in newo) {
                 old[o] = newo[o];
             }
             return old;
@@ -75,132 +66,65 @@ var xPagination = function (doc) {
         hide = function (elm, f) {
             elm.style.display = f === undefined ? 'none' : f;
         },
-        // 根据当前页，总数页，最多显示页计算出应显示的页码
-        pageCalc = function (curr, pages, max) {
-            //console.log('curr,pages,max',curr,pages,max)
-            var start = 1,
-                // var end = max;
-                //var truehalf = max / 2;
-                half = Math.floor(max / 2),
-                maxLength = Math.min(pages, max) - 1;
-            // if (pages < end) {
-            //     end  = pages;
-            // }
-            //console.log('start,half,max',start,half,max)
-            //如果当前页大于最多显示页的一半，当前页放中间
-            if (pages > max && curr >= half) {
-                start = curr - half;
-                // end =  (curr + half) > pages ? pages : curr + half;
-                if (curr === pages - 1) {
-                    // start = curr - half -(half<truehalf ? 1 : 2);
-                    start = curr - (half + 1);
-                }
-                if (curr === pages) {
-                    start = curr - maxLength;
-                    start = start || 1;
-                }
-            }
-            if (start + maxLength > pages) {
-                start = pages - maxLength;
-            }
-            start = start > 0 ? start : 1;
-            return start;
-        },
         pageActive = 'page-item-active',
         pageItem = 'page-item',
         pageHover = 'page-item-hover',
         pageDisable = 'disable',
-        setPages = function() {
+        setPages = function () {
             var root = this,
                 Options = root.options,
                 items = Options.items-=0,
                 pages = Options.pages-=0,
-                curr = Options.curr-=0,
                 max = Options.max-=0,
-                temp,
                 lis = [],
-                start,
-                end,
-                pi,
-                jumpinput,
-                jumpbt,
-                noNext,
-                list,
-                pp,
-                page,
-                target,
-                li,
-                plStart = 1,
-                plEnd = 1,
                 i,
                 pageList = root.pageList,
                 elli;
+            Options.size -= 0;    
             if (items) {
                 pages = Options.pages = Math.ceil(items / Options.size);
             }
             pageList.innerHTML = '';
-            // lis.push('<li class="' + pageItem +'" ui-page="1">1</li>');
-            // start = pageCalc(curr, pages, max);
-            // end = start + (max - 1);
-            // if (end > pages) {
-            //     end = pages;
-            // }
             max = Math.min(max, pages);
             lis.push('<li class="' + pageItem + '" ui-page="first">1</li>');
             for (i = 2; i < max; i++) {
                 lis.push('<li class="' + pageItem + '" ui-page="' + i + '">' + i + '</li>');
             }
-            if(max > 1) {
+            if (max > 1) {
                 lis.push('<li class="' + pageItem + '" ui-page="last">' + pages + '</li>');
-            }      
-            if(pages > max) {
-                plStart += 1;
-                plEnd += 1;
+            }
+            if (pages > max) {
                 elli = '<li class="page-ellipsis" ui-page="ellipsis">...</li>';
                 lis.splice(1, 0, elli);
                 lis.splice(lis.length - 1, 0, elli);
             }
-            
             if (Options.prev) {
-                plStart += 1;
                 lis.unshift('<li class="page-btn-prev" ui-page="prev">' + Options.prev + '</li>');
             }
             if (Options.next) {
-                plEnd += 1;
                 lis.push('<li class="page-btn-next" ui-page="next">' + Options.next + '</li>');
             }
             // console.log(pageList, lis);
             pageList.innerHTML = lis.join('');
-            root.hasEllipsis = pages > max; 
-        },
-        getPage = function (el) {
-            return el.getAttribute('ui-page');
+            root.hasEllipsis = pages > max;
         },
         Pagination = function (el, options) {
             this.options = extend({}, defaults);
             extend(this.options, options);
             var root = this,
-                Options = root.options,                
-                pages = Options.pages-=0,
-                curr = Options.curr-=0,
+                Options = root.options,
+                pages = (Options.pages-=0),
+                curr = (Options.curr -=0),
                 max = Options.max-=0,
                 temp,
                 items = [],
-                start,
-                end,
                 pi,
                 jumpinput,
                 jumpbt,
-                noNext,
-                list,
                 pp,
                 page,
-                target,
                 li,
-                plStart = 0,
-                plEnd = 0,
                 i,
-                pageList,
                 elli,
                 pageCodes = {
                     last: function () {
@@ -217,13 +141,13 @@ var xPagination = function (doc) {
             temp = el;
             el = create('page-list', 'UL');
             temp.appendChild(el);
-            if(!hasClass(temp, 'page-list-wrap')) {
-            	addClass(temp, 'page-list-wrap');
+            if (!hasClass(temp, 'page-list-wrap')) {
+                addClass(temp, 'page-list-wrap');
             }
             this.pageList = el;
             // 生成页码
-            setPages.call(this);        
-            if(Options.onpagination) root.onpagination = Options.onpagination;
+            setPages.call(this);
+            if (Options.onpagination) root.onpagination = Options.onpagination;
             if (Options.showSize) {
                 Options.size -= 0;
                 var ul = create('page-list page-size', 'ul'),
@@ -251,7 +175,7 @@ var xPagination = function (doc) {
                             setPages.call(root);
                         }
                         // root.onpagination && root.onpagination(Options.curr, num);                        
-                        root.go(root.options.curr);
+                        root.go(Options.curr);
                         for (i = 0; i < 3; i++) {
                             removeClass(ul.children[i], pageHover);
                         }
@@ -264,11 +188,14 @@ var xPagination = function (doc) {
                     root.meta = el.parentNode.appendChild(create('page-list page-meta', 'ul'));
                 }
                 pi = create('page-text', 'li');
-                if (Options.items) {
+                if('function' === typeof Options.info) {
+                    pi.innerHTML = Options.info(Options);
+                } else if (Options.items){
                     pi.innerHTML = '共' + Options.items + '条';
                 } else {
                     pi.innerHTML = '共' + pages + '页';
                 }
+                
                 root.info = root.meta.appendChild(pi);
             }
             if (Options.jump) {
@@ -294,7 +221,7 @@ var xPagination = function (doc) {
                 root.jump = root.meta.appendChild(jumpbt);
                 root.jump.onclick = function () {
                     page = this.previousSibling.getElementsByTagName('input')[0].value;
-                    page = paseInt(page, 10);
+                    page = parseInt(page, 10);
                     if (!isNaN(page) && page !== '') {
                         root.go(page);
                     }
@@ -362,7 +289,7 @@ var xPagination = function (doc) {
                 // console.log(start, pl);
                 for (i = 0; i < pl; i++) {
                     li = pageList[i];
-                    pg = getPage(li);
+                    pg = li.getAttribute('ui-page');
                     // console.log(li,i, start, pg)
                     if(d.test(pg)) {
                         if(pg != start) {
@@ -413,6 +340,9 @@ var xPagination = function (doc) {
             
             if (root.jump) {
                 root.jump.previousSibling.getElementsByTagName('input')[0].value = page;
+            }
+            if('function' === typeof Options.info) {
+                root.info.innerHTML = Options.info(Options);
             }
             // console.log(page,start,root.currPageElement)
         }
