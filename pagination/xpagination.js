@@ -1,5 +1,7 @@
 /*
 xPagenation - 分页导航组件。
+作者：十年灯 - http://jo2.org
+Git: https://github.com/wslx520/wslx520.github.io/tree/master/pagination
 支持设置的选项：
 max : 最多同时显示好多页
 curr : 当前页码
