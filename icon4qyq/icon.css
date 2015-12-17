@@ -497,6 +497,16 @@ i.i.icon_face_bad {
   width: 32px;
   height: 32px;
 }
+i.i.icon_backtop {
+  background-position: -64 -256px;
+  width: 32px;
+  height: 32px;
+}
+i.i.icon_backtop_hover {
+  background-position: -96px -256px;
+  width: 32px;
+  height: 32px;
+}
 i.i.icon_home_icon1 {
   background-position: 0 -288px;
   width: 100px;
