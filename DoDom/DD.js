@@ -66,7 +66,7 @@ var dd,
             		setProp(elem, a, props[a]);
             	}
             },
-            getText = if(tempEl.innerText !== undef) ? function (elem) {
+            getText = tempEl.innerText !== undef ? function (elem) {
             	return elem.innerText;
             } : function (elem) {
             	return elem.textContent;
@@ -184,14 +184,14 @@ var dd,
 
                 }
                 return function(elem, type) {
-                    var res;
-                    var classes = ' ' + elem.className + ' ';
+                    var res, classes;
                     for (; res = reg.exec(type);) {
                         var match = res[0],
                             first = match.substr(0, 1);
                         if (first == '#') {
                             if (elem.getAttribute('id') != res[3]) return false;
                         } else if (first == '.') {
+                            classes = ' ' + elem.className + ' ';
                             if (classes.indexOf(' ' + res[3] + ' ') < 0) return false;
                         } else if (first == '[') {
                             if (checkAttr(elem, {
@@ -206,6 +206,7 @@ var dd,
                     return true;
                 }
             }(),
+            // fina = finally,即终止查找的元素
             closest = function(elm, fn, fina) {
                 var isstring = isString(fn),
                     body = doc.body;
@@ -241,16 +242,26 @@ var dd,
                 var siblings = [], first = elm.parentNode.firstChild;
                 while (first) {
                     // console.log(first)
-                    if (first.nodeType === 1) {
+                    if (first.nodeType === 1 && first !== elm) {
                         siblings.push(first);
                     }
                     first = first.nextSibling;
                 }
                 return siblings;
             },
+            changeDisable = function (elm, dis, cls) {
+                elm.disabled = dis;
+                // cls && (dis == true ? addClass : removeClass)(elm, cls);  
+            },
+            changeDisplay = function (elm, dis) {
+                if(dis == undef) {
+                    dis = 'block';
+                }
+                elm.style.display = dis;
+            },
             nodesToArray = function(nodes) {
                 try {
-                    nodes = Array.prototype.slice.call(nodes);
+                    return Array.prototype.slice.call(nodes);
                 } catch (e) {
                     var res = [];
                     nodesLoop(nodes, function(node) {
@@ -319,13 +330,20 @@ var dd,
         }
         DoDom.prototype = {
             hasClass: function(clses) {
-                clses = splitString(clses);
-                var nodes = this.nodes,
-                    cl = clses.length;
-                if (nodes.length === 1 && cl === 1) {
-                    // 一个元素，判断一个class
-                    return hasClass(nodes[0], clses[0]);
+                var nodes = this.nodes, cl, singleClass = clses.indexOf(' ') === -1;
+                // 只有一个class
+                if(singleClass) {
+                    // 节点集里只有一个节点时
+                    if(nodes.length === 1) return hasClass(nodes[0], clses[0]);
+                    for (var n = 0, node; node = nodes[n++];) {
+                        if (hasClass(node, clses)) {
+                           return true;
+                        }
+                    }
+                    return false;
                 }
+                clses = splitString(clses);                                
+                cl = clses.length;
                 for (var n = 0, node, hasAll, c; node = nodes[n++];) {
                     hasall = 0;
                     for (c = cl; c--;) {
@@ -339,7 +357,7 @@ var dd,
             },
             addClass: function(clses) {
                 clses = splitString(clses);
-                var c = cl = clses.length;
+                var c, cl = clses.length;
                 nodesLoop(this.nodes, function(node) {
                     for (c = cl; c--;) {
                         // console.log(c,clses[c])
@@ -500,11 +518,12 @@ var dd,
             	return i===undef ? this.nodes : this.nodes[i];
             }
         }
-        DoDom.contains = doc.body.contains ? function(par, chi) {
+        DoDom.contains = tempEl.contains ? function(par, chi) {
             return par.contains(chi);
         } : function(par, chi) {
             return !!(par.compareDocumentPosition(chi) & 16);
         };
+
         return function(nodes) {
             return new DoDom(nodes);
         };
