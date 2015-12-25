@@ -8,6 +8,39 @@ var dd,
     },
     // 正式函数开始
     DD = dd = function(doc, undef) {
+        // IE7 的querySelectorAll
+        !function psudoQuerySelector () {
+            if (doc.querySelectorAll) return;
+            var head = doc.documentElement.firstChild;
+            function createStyleTag () {
+                return head.appendChild(doc.createElement('STYLE'));
+            }
+            function removeStyleTag (styleTag) {
+                window.scrollBy(0, 0);
+                setTimeout(function () {
+                    head.removeChild(styleTag);
+                },0);
+            }
+            doc.querySelectorAll = function(selector) {
+                var styleTag = createStyleTag();
+                doc.__qsaels = [];
+
+                styleTag.styleSheet.cssText = selector + "{x:expression(document.__qsaels.push(this))}";
+                
+                removeStyleTag(styleTag);
+                return doc.__qsaels;
+            }
+
+            doc.querySelector = function(selector) {
+                var styleTag = createStyleTag();
+                doc.__qsael = null;
+                styleTag.styleSheet.cssText = selector + "{x:expression(document.__qsael = document.__qsael || this )}";
+                removeStyleTag(styleTag);
+                
+                return doc.__qsael;
+            }
+            
+        }();
         var
             html = doc.documentElement,
             blank = /\s+/,
@@ -28,7 +61,10 @@ var dd,
             splitString = function(clses) {
                 return clses.split(blank);
             },
-
+            // 字符串整洁化，去掉首尾空格，把多个空格替换为1个
+            cleanString = function (str) {
+                return trim(str.replace(/\s{2,}/,' '));
+            },
             // 直接添加
             addClass = function(elm, cls) {
                 elm.className += ' ' + cls;
