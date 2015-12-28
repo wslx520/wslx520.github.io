@@ -355,8 +355,12 @@ var dd,
             };
 
         function DoDom(nodes) {
-            this.nodes = nodes.tagName && nodes.nodeName ? [nodes] : nodes;
-            this.length = this.nodes.length;
+            var root = this;
+            root.nodes = nodes.tagName && nodes.nodeName ? [nodes] : nodes;
+            nodesLoop(root.nodes, function (node, n) {
+                root[n] = node;
+            })
+            root.length = root.nodes.length;
         }
 
         function nodesLoop(nodes, fn) {
@@ -552,15 +556,52 @@ var dd,
             },
             get: function (i) {
             	return i===undef ? this.nodes : this.nodes[i];
+            },
+            getBy: function (fn, justOne) {
+                var res = [], nodes = this.nodes, n=0, nl = nodes.length, node;
+                for(;n<nl;n++) {
+                    node = nodes[n];
+                    if(fn(node) === true) {
+                        if(justOne) return node;
+                        res.push(node);
+                    }
+                }
+                return res;
+            },
+            find: function (selector) {
+                var res = [], temp;
+                nodesLoop(this.nodes, function (node, n) {
+                    if(!node.id) node.id = '__DoDom__'+new Date().getTime();
+                    temp = doc.querySelectorAll('#'+node.id + ' '+ selector);
+                    temp = nodesToArray(temp);
+                    res = res.concat(temp);
+                });
+                return new DoDom(res);
             }
         }
-        DoDom.contains = tempEl.contains ? function(par, chi) {
+        function Main(nodes) {
+            return new DoDom(nodes);
+        }
+        Main.contains = tempEl.contains ? function(par, chi) {
             return par.contains(chi);
         } : function(par, chi) {
             return !!(par.compareDocumentPosition(chi) & 16);
         };
-
-        return function(nodes) {
-            return new DoDom(nodes);
-        };
+        Main.create = function (htmlstr, props) {
+            var temp;
+            if(htmlstr.indexOf('<') === 0) {
+                temp = doc.createElement('div');
+                temp.innerHTML = htmlstr;
+                return temp.firstChild;
+            } else {
+                temp = doc.createElement(htmlstr);
+                if(props) {
+                    for(var p in props) {
+                        temp[p] = props[p];
+                    }
+                }
+                return temp;
+            }
+        }
+        return Main;
     }(document)

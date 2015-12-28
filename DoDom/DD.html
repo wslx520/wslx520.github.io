@@ -8,7 +8,9 @@
   <META NAME="Keywords" CONTENT="">
   <META NAME="Description" CONTENT="">
   <style type="text/css">
-
+    .red {
+        color: #f00;
+    }
   </style>
  </HEAD>
 <BODY>
@@ -17,12 +19,15 @@
 <button type="button">Button</button>
 <input type="button" value="Button by input" />
 <button  style="background-color: #a3d3f5;border: none;padding:0;overflow:visible;height:36px"><span style="display:block;position:relative;">Disabled Button</span></button>
-<div id="div" class="a b c d div">一个div</div>
+<div id="div" class="a b c d div">一个div
+    <a href="#">a标签in div</a>
+</div>
 <div id="div2" class="aa bb div">div2</div>
 <script src="DD.js"></script>
 <script>
     // console.log(dd($$('div')).addClass('bb b').removeClass('b').toggleClass('a b').hasClass('div'))
     console.log(dd($$('div')).prev())
+    console.log(dd($$('div')).find('a').addClass('red'));
     // console.log(dd(document.getElementsByTagName('div')).siblings().length)
 
 </script>
