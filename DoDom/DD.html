@@ -16,6 +16,9 @@
         margin: 1em;
     }
   </style>
+  <!--[if lt IE 8]>
+  <script src="ie7.queryselectorall.js"></script>
+  <![endif]-->
  </HEAD>
 <BODY>
 <h2 class="red">
@@ -27,15 +30,18 @@
 <button type="button">Button</button>
 <input type="button" value="Button by input" />
 <button disabled="true"  style="background-color: #a3d3f5;color:#border: none;padding:0;overflow:visible;height:36px"><span style="display:block;position:relative;">Disabled Button</span></button>
-<div id="div" class="a b c d div">一个div
+
+<div id="div" class="a b c d div">
+    一个div
     <a href="#">a标签in div</a>
 </div>
-<div id="div2" class="aa bb div">#div2
+<div id="div2" class="aa bb div">
+    #div2
     <form action="" id="form2">
         <input type="text" name="" id="" /> <br />
-        <input type="radio" name="" id="" /> 1 
-        <input type="radio" name="" id="" /> 2 
-        <input type="radio" name="" id="" /> 3 
+        <input type="radio" name="r" id="" value="1" /> 1 
+        <input type="radio" name="r" id="" value="2" /> 2 
+        <input type="radio" name="r" id="" value="3" /> 3 
         <br />
         <input type="checkbox" name="check" id="" /> 11
         <input type="checkbox" name="check" id="" /> 22
@@ -44,12 +50,11 @@
 </div>
 <script src="DD.js"></script>
 <script>
-
     // console.log(dd($$('div')).addClass('bb b').removeClass('b').toggleClass('a b').hasClass('div'))
-    var t = Date.now();
+    var t = new Date().getTime();
     console.log(dd($$('div')).prev())
     console.log(dd($$('div')).find('a').addClass('red'));
-    console.log(Date.now() -t);
+    console.log(new Date().getTime() -t);
     // console.log(dd(document.getElementsByTagName('div')).siblings().length)
 
 </script>

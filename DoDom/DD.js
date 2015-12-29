@@ -8,39 +8,6 @@ var dd,
     },
     // 正式函数开始
     DD = dd = function(doc, undef) {
-        // IE7 的querySelectorAll
-        !function psudoQuerySelector () {
-            if (doc.querySelectorAll) return;
-            var head = doc.documentElement.firstChild;
-            function createStyleTag () {
-                return head.appendChild(doc.createElement('STYLE'));
-            }
-            function removeStyleTag (styleTag) {
-                window.scrollBy(0, 0);
-                setTimeout(function () {
-                    head.removeChild(styleTag);
-                },0);
-            }
-            doc.querySelectorAll = function(selector) {
-                var styleTag = createStyleTag();
-                doc.__qsaels = [];
-
-                styleTag.styleSheet.cssText = selector + "{x:expression(document.__qsaels.push(this))}";
-                
-                removeStyleTag(styleTag);
-                return doc.__qsaels;
-            }
-
-            doc.querySelector = function(selector) {
-                var styleTag = createStyleTag();
-                doc.__qsael = null;
-                styleTag.styleSheet.cssText = selector + "{x:expression(document.__qsael = document.__qsael || this )}";
-                removeStyleTag(styleTag);
-                
-                return doc.__qsael;
-            }
-            
-        }();
         var
             html = doc.documentElement,
             blank = /\s+/,
@@ -115,13 +82,13 @@ var dd,
             } : function() {
                 var event_id = 0,
                     fire_ie = function(evt) {
-                        var returnValue = true;
+                        var returnValue = true, handlers, i;
                         // grab the event object (IE uses a global event object)
                         evt = evt || ((this.ownerDocument || this.document || this).parentWindow || window).event;
                         // get a reference to the hash table of event handlers
-                        var handlers = this.events[event.type];
+                        handlers = this.events[event.type];
                         // execute each event handler
-                        for (var i in handlers) {
+                        for (i in handlers) {
                             // this.$$handleEvent = handlers[i]; //修复this指向
                             // if (this.$$handleEvent(evt) === false) {
                             if (handlers[i].call(this, evt) === false) {
@@ -164,8 +131,8 @@ var dd,
                 } else { //IE8及以下
                     // el['on'+type] && el['on'+type]();
                     if (el.events && el.events[type]) {
-                        var handlers = el.events[type];
-                        for (var i in handlers) handlers[i].call(el);
+                        var handlers = el.events[type], i;
+                        for (i in handlers) handlers[i].call(el);
                     }
                 }
             },
@@ -220,10 +187,10 @@ var dd,
 
                 }
                 return function(elem, type) {
-                    var res, classes;
+                    var res, classes, match, first;
                     for (; res = reg.exec(type);) {
-                        var match = res[0],
-                            first = match.substr(0, 1);
+                        match = res[0];
+                        first = match.substr(0, 1);
                         if (first == '#') {
                             if (elem.getAttribute('id') != res[3]) return false;
                         } else if (first == '.') {
@@ -343,9 +310,9 @@ var dd,
                 }
             }(),
             nodesUniq = function(nodes) {
-                var hasDuplicate = nodesSort(nodes);
+                var hasDuplicate = nodesSort(nodes), i;
                 if (hasDuplicate) {
-                    for (var i = 1; i < nodes.length; i++) {
+                    for (i = 1; i < nodes.length; i++) {
                         if (nodes[i] === nodes[i - 1]) {
                             nodes.splice(i--, 1);
                         }
@@ -380,25 +347,21 @@ var dd,
             return ret;
         }
         function DoDom(nodes) {
-            var root = this;
-            this.toArray(makeArray(nodes));
+            // this.toArray(makeArray(nodes));
+            this.length = 0;
+            AP.push.apply(this, makeArray(nodes));
             return this;
         }
         DoDom.prototype = {
             constructor: DoDom,
             splice: tempArr.splice,
-            toArray: function (arr) {
-                this.length = 0;
-                AP.push.apply(this, arr);
-                return this;
-            },
             hasClass: function(clses) {
-                var nodes = this, cl, singleClass = clses.indexOf(' ') === -1;
+                var nodes = this, cl, singleClass = clses.indexOf(' ') === -1, n;
                 // 只有一个class
                 if(singleClass) {
                     // 节点集里只有一个节点时
                     if(nodes.length === 1) return hasClass(nodes[0], clses[0]);
-                    for (var n = 0, node; node = nodes[n++];) {
+                    for (n = 0, node; node = nodes[n++];) {
                         if (hasClass(node, clses)) {
                            return true;
                         }
@@ -407,7 +370,7 @@ var dd,
                 }
                 clses = splitString(clses);                                
                 cl = clses.length;
-                for (var n = 0, node, hasAll, c; node = nodes[n++];) {
+                for (n = 0, node, hasAll, c; node = nodes[n++];) {
                     hasall = 0;
                     for (c = cl; c--;) {
                         if (hasClass(node, clses[c])) {
@@ -473,9 +436,9 @@ var dd,
             },
             // 解除绑定的所有事件
             unbindAll: function() {
-                var nodes = this;
+                var nodes = this, tempnode;
                 nodesLoop(this, function(node, n) {
-                    var tempnode = node.cloneNode(true);
+                    tempnode = node.cloneNode(true);
                     node.parentNode.replaceChild(tempnode, node);
                     nodes[n] = tempnode;
                 });
@@ -566,8 +529,9 @@ var dd,
                 return this;
             },
             index: function (elem) {
+                var n, siblings;
             	if(elem) {
-            		for(var n=0,node, nodes = this;node = nodes[n++];) {
+            		for(n=0,node, nodes = this;node = nodes[n++];) {
             			if(node === elem) {
             				return n-1;
             			}
@@ -575,7 +539,7 @@ var dd,
             		return -1;
             	}
             	node = this[0];
-            	var siblings = node.parentNode.chilren, sl = siblings.length, s= 0;
+            	siblings = node.parentNode.chilren, sl = siblings.length, s= 0;
             	for(; s< sl; s++) {
             		if(siblings[s] === node) {
             			return s;
@@ -598,12 +562,17 @@ var dd,
                 return res;
             },
             find: function (selector) {
-                var res = [], temp;
+                var res = [], temp, noid;
                 nodesLoop(this, function (node, n) {
-                    if(!node.id) node.id = '__DoDom__'+new Date().getTime();
+                    noid = false;
+                    if(!node.id) {
+                        noid = true;
+                        node.id = '__DoDom__'+new Date().getTime();
+                    }
                     temp = doc.querySelectorAll('#'+node.id + ' '+ selector);
                     temp = nodesToArray(temp);
                     res = res.concat(temp);
+                    if(noid) setAttr(node, id, '');
                 });
                 return new DoDom(res);
             }
@@ -617,7 +586,7 @@ var dd,
             return !!(par.compareDocumentPosition(chi) & 16);
         };
         Main.create = function (htmlstr, props) {
-            var temp;
+            var temp, p;
             if(htmlstr.indexOf('<') === 0) {
                 temp = doc.createElement('div');
                 temp.innerHTML = htmlstr;
@@ -625,7 +594,7 @@ var dd,
             } else {
                 temp = doc.createElement(htmlstr);
                 if(props) {
-                    for(var p in props) {
+                    for(p in props) {
                         temp[p] = props[p];
                     }
                 }
