@@ -352,25 +352,48 @@ var dd,
                     }
                 }
                 return nodes;
-            };
-
-        function DoDom(nodes) {
-            var root = this;
-            root.nodes = nodes.tagName && nodes.nodeName ? [nodes] : nodes;
-            nodesLoop(root.nodes, function (node, n) {
-                root[n] = node;
-            })
-            root.length = root.nodes.length;
-        }
+            },
+            tempArr = [],
+            AP = Array.prototype;
 
         function nodesLoop(nodes, fn) {
             for (var n = 0, node; node = nodes[n++];) {
                 fn(node, n - 1);
             }
         }
+        function makeArray (arr) {
+            if(typeof arr === 'object' && arr.splice) return arr;
+            var ret = [], i;
+            if( arr != null ){    
+                i = arr.length;
+                //单个元素，但window, string、 function有 'length'的属性，加其它的判断
+                if( i == null || arr.split || arr.setInterval || arr.call ){
+                    ret[0] = arr;
+                }else{
+                    try{
+                        ret = Array.prototype.slice.call(arr)
+                    }catch(e){
+                        while( i ) ret[--i] = arr[i];//Clone数组
+                    }
+                }
+            }
+            return ret;
+        }
+        function DoDom(nodes) {
+            var root = this;
+            this.toArray(makeArray(nodes));
+            return this;
+        }
         DoDom.prototype = {
+            constructor: DoDom,
+            splice: tempArr.splice,
+            toArray: function (arr) {
+                this.length = 0;
+                AP.push.apply(this, arr);
+                return this;
+            },
             hasClass: function(clses) {
-                var nodes = this.nodes, cl, singleClass = clses.indexOf(' ') === -1;
+                var nodes = this, cl, singleClass = clses.indexOf(' ') === -1;
                 // 只有一个class
                 if(singleClass) {
                     // 节点集里只有一个节点时
@@ -398,7 +421,7 @@ var dd,
             addClass: function(clses) {
                 clses = splitString(clses);
                 var c, cl = clses.length;
-                nodesLoop(this.nodes, function(node) {
+                nodesLoop(this, function(node) {
                     for (c = cl; c--;) {
                         // console.log(c,clses[c])
                         if (!hasClass(node, clses[c])) {
@@ -411,7 +434,7 @@ var dd,
             removeClass: function(clses) {
                 // temp，为移除单个样式时作性能优化（很常用,很必要）
                 var temp = clses.indexOf(' ') === -1 ? removeSingleClass : removeClass,
-                    nodes = this.nodes,
+                    nodes = this,
                     nl = 0,
                     node;
                 for (; node = nodes[nl++]; temp(node, clses));
@@ -421,7 +444,7 @@ var dd,
                 clses = splitString(clses);
                 var c = cl = clses.length,
                     cls;
-                nodesLoop(this.nodes, function(node) {
+                nodesLoop(this, function(node) {
                     for (c = cl; c--;) {
                         cls = clses[c];
                         if (hasClass(node, cls)) {
@@ -434,24 +457,24 @@ var dd,
                 return this;
             },
             remove: function() {
-                nodesLoop(this.nodes, remove);
+                nodesLoop(this, remove);
             },
             bind: function(type, fn) {
-                nodesLoop(this.nodes, function(node) {
+                nodesLoop(this, function(node) {
                     addEvent(node, type, fn);
                 });
                 return this;
             },
             unbind: function(type, fn) {
-                nodesLoop(this.nodes, function(node) {
+                nodesLoop(this, function(node) {
                     removeEvent(node, type, fn);
                 });
                 return this;
             },
             // 解除绑定的所有事件
             unbindAll: function() {
-                var nodes = this.nodes;
-                nodesLoop(this.nodes, function(node, n) {
+                var nodes = this;
+                nodesLoop(this, function(node, n) {
                     var tempnode = node.cloneNode(true);
                     node.parentNode.replaceChild(tempnode, node);
                     nodes[n] = tempnode;
@@ -460,92 +483,98 @@ var dd,
             },
             // 手动触发元素上绑定的某类事件，比click,mousedown
             fire: function(type) {
-                nodesLoop(this.nodes, function(node) {
+                nodesLoop(this, function(node) {
                     fireEvent(node, type);
                 });
                 return this;
             },
             next: function() {
                 var nexts = [];
-                getNext(this.nodes[0])
-                nodesLoop(this.nodes, function(node) {
+                getNext(this[0])
+                nodesLoop(this, function(node) {
                     nexts.push(getNext(node));
                 });
-                return nexts;
+                return new DoDom(nexts);
             },
             prev: function() {
                 var prevs = [];
-                nodesLoop(this.nodes, function(node) {
+                nodesLoop(this, function(node) {
                     prevs.push(getPrev(node));
                 });
-                return prevs;
+                return new DoDom(prevs);
             },
             // 
             siblings: function() {
                 var allSiblings = [];
-                nodesLoop(this.nodes, function (node) {
+                nodesLoop(this, function (node) {
                     allSiblings = allSiblings.concat(getSiblings(node));
                 });
                 return nodesUniq(allSiblings);
             },
             removeAttr: function (attrname) {
-            	nodesLoop(this.nodes, function (node) {
+            	nodesLoop(this, function (node) {
             		node.removeAttribute(attrname)
             	})
+                return this;
             },
             attr: function (name, val) {
             	var temp;
             	if(isString(name)) {
             		if(val === undef) { 
-            			return getAttr(this.nodes[0], name);
+            			return getAttr(this[0], name);
             		}
             		temp = setAttr;
             	} else {
             		temp = setAttrs;
             	}            	
-            	nodesLoop(this.nodes, function (node) {
+            	nodesLoop(this, function (node) {
             		temp(node, name, val);
             	})
+                return this;
             },
             prop: function (name, val) {
             	var temp;
             	if(isString(name)) {
             		if(val === undef) {
-            			return this.nodes[0][name];
+            			return this[0][name];
             		}
             		temp = setProp;
             	} else {
             		temp = setProps;
             	}
-            	nodesLoop(this.nodes, function (node) {
+            	nodesLoop(this, function (node) {
             		temp(node, name, val);
             	})
+                return this;
             },
             text: function (txt) {
-            	if(txt === undef) return getText(this.nodes[0]);
-            	nodesLoop(this.nodes, function (node) {
+            	if(txt === undef) return getText(this[0]);
+            	nodesLoop(this, function (node) {
             		setText(node, txt);
             	})
+                return this;
             },
             html: function (html) {
-            	if(html === undef) return this.nodes[0].innerHTML;
-            	nodesLoop(this.nodes, function (node) {
+            	if(html === undef) return this[0].innerHTML;
+            	nodesLoop(this, function (node) {
             		node.innerHTML = html;
             	})
+                return this;
             },
             each: function (fn) {
-            	nodesLoop(this.nodes, fn);
+            	nodesLoop(this, fn);
+                return this;
             },
             index: function (elem) {
             	if(elem) {
-            		for(var n=0,node, nodes = this.nodes;node = nodes[n++];) {
+            		for(var n=0,node, nodes = this;node = nodes[n++];) {
             			if(node === elem) {
             				return n-1;
             			}
             		}
             		return -1;
             	}
-            	node = this.nodes[0];
+            	node = this[0];
             	var siblings = node.parentNode.chilren, sl = siblings.length, s= 0;
             	for(; s< sl; s++) {
             		if(siblings[s] === node) {
@@ -555,10 +584,10 @@ var dd,
             	return -1;
             },
             get: function (i) {
-            	return i===undef ? this.nodes : this.nodes[i];
+            	return i===undef ? this : this[i];
             },
             getBy: function (fn, justOne) {
-                var res = [], nodes = this.nodes, n=0, nl = nodes.length, node;
+                var res = [], nodes = this, n=0, nl = nodes.length, node;
                 for(;n<nl;n++) {
                     node = nodes[n];
                     if(fn(node) === true) {
@@ -570,7 +599,7 @@ var dd,
             },
             find: function (selector) {
                 var res = [], temp;
-                nodesLoop(this.nodes, function (node, n) {
+                nodesLoop(this, function (node, n) {
                     if(!node.id) node.id = '__DoDom__'+new Date().getTime();
                     temp = doc.querySelectorAll('#'+node.id + ' '+ selector);
                     temp = nodesToArray(temp);
