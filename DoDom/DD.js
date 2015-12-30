@@ -13,6 +13,9 @@ var dd,
             blank = /\s+/,
             // 临时用的元素，用来判断浏览器是否支持某些原生方法
             tempEl = doc.createElement('div'),
+            isUndef = function (ii) {
+                return ii === undef;
+            },
             camelCase = function(str) {
                 return str.replace(/-([a-z])/g, function(m, $1) {
                     return $1.toUpperCase();
@@ -69,7 +72,7 @@ var dd,
             		setProp(elem, a, props[a]);
             	}
             },
-            getText = tempEl.innerText !== undef ? function (elem) {
+            getText = !isUndef(tempEl.innerText) ? function (elem) {
             	return elem.innerText;
             } : function (elem) {
             	return elem.textContent;
@@ -227,19 +230,23 @@ var dd,
                     elm = elm.parentNode
                 }
             },
-            getNext = function(elm) {
+            getNext = isUndef(tempEl.nextElementSibling) ? function(elm) {
                 while (elm = elm.nextSibling) {
                     if (elm.nodeType === 1) {
                         return elm;
                     }
                 }
+            } : function (elm) {
+                return elm.nextElementSibling;
             },
-            getPrev = function(elm) {
+            getPrev = isUndef(tempEl.previousElementSibling) ? function(elm) {
                 while (elm = elm.previousSibling) {
                     if (elm.nodeType === 1) {
                         return elm;
                     }
                 }
+            } : function (elm) {
+                return elm.previousElementSibling;
             },
             getSiblings = function(elm) {
                 var siblings = [], first = elm.parentNode.firstChild;
@@ -257,7 +264,7 @@ var dd,
                 // cls && (dis == true ? addClass : removeClass)(elm, cls);  
             },
             changeDisplay = function (elm, dis) {
-                if(dis == undef) {
+                if(isUndef(dis)) {
                     dis = 'block';
                 }
                 elm.style.display = dis;
@@ -356,12 +363,12 @@ var dd,
             constructor: DoDom,
             splice: tempArr.splice,
             hasClass: function(clses) {
-                var nodes = this, cl, singleClass = clses.indexOf(' ') === -1, n;
+                var  cl, singleClass = clses.indexOf(' ') === -1, n;
                 // 只有一个class
                 if(singleClass) {
                     // 节点集里只有一个节点时
-                    if(nodes.length === 1) return hasClass(nodes[0], clses[0]);
-                    for (n = 0, node; node = nodes[n++];) {
+                    if(this.length === 1) return hasClass(this[0], clses[0]);
+                    for (n = 0, node; node = this[n++];) {
                         if (hasClass(node, clses)) {
                            return true;
                         }
@@ -370,7 +377,7 @@ var dd,
                 }
                 clses = splitString(clses);                                
                 cl = clses.length;
-                for (n = 0, node, hasAll, c; node = nodes[n++];) {
+                for (n = 0, node, hasAll, c; node = this[n++];) {
                     hasall = 0;
                     for (c = cl; c--;) {
                         if (hasClass(node, clses[c])) {
@@ -397,10 +404,9 @@ var dd,
             removeClass: function(clses) {
                 // temp，为移除单个样式时作性能优化（很常用,很必要）
                 var temp = clses.indexOf(' ') === -1 ? removeSingleClass : removeClass,
-                    nodes = this,
                     nl = 0,
                     node;
-                for (; node = nodes[nl++]; temp(node, clses));
+                for (; node = this[nl++]; temp(node, clses));
                 return this;
             },
             toggleClass: function(clses) {
@@ -436,11 +442,11 @@ var dd,
             },
             // 解除绑定的所有事件
             unbindAll: function() {
-                var nodes = this, tempnode;
+                var tempnode;
                 nodesLoop(this, function(node, n) {
                     tempnode = node.cloneNode(true);
                     node.parentNode.replaceChild(tempnode, node);
-                    nodes[n] = tempnode;
+                    this[n] = tempnode;
                 });
                 return this;
             },
@@ -453,7 +459,6 @@ var dd,
             },
             next: function() {
                 var nexts = [];
-                getNext(this[0])
                 nodesLoop(this, function(node) {
                     nexts.push(getNext(node));
                 });
@@ -483,7 +488,7 @@ var dd,
             attr: function (name, val) {
             	var temp;
             	if(isString(name)) {
-            		if(val === undef) { 
+            		if(isUndef(val)) { 
             			return getAttr(this[0], name);
             		}
             		temp = setAttr;
@@ -498,7 +503,7 @@ var dd,
             prop: function (name, val) {
             	var temp;
             	if(isString(name)) {
-            		if(val === undef) {
+            		if(isUndef(val)) {
             			return this[0][name];
             		}
             		temp = setProp;
@@ -511,14 +516,14 @@ var dd,
                 return this;
             },
             text: function (txt) {
-            	if(txt === undef) return getText(this[0]);
+            	if(isUndef(txt)) return getText(this[0]);
             	nodesLoop(this, function (node) {
             		setText(node, txt);
             	})
                 return this;
             },
             html: function (html) {
-            	if(html === undef) return this[0].innerHTML;
+            	if(isUndef(html)) return this[0].innerHTML;
             	nodesLoop(this, function (node) {
             		node.innerHTML = html;
             	})
@@ -531,7 +536,7 @@ var dd,
             index: function (elem) {
                 var n, siblings;
             	if(elem) {
-            		for(n=0,node, nodes = this;node = nodes[n++];) {
+            		for(n=0,node;node = this[n++];) {
             			if(node === elem) {
             				return n-1;
             			}
@@ -548,12 +553,12 @@ var dd,
             	return -1;
             },
             get: function (i) {
-            	return i===undef ? this : this[i];
+            	return isUndef(i) ? this : this[i];
             },
             getBy: function (fn, justOne) {
-                var res = [], nodes = this, n=0, nl = nodes.length, node;
+                var res = [], n=0, nl = this.length, node;
                 for(;n<nl;n++) {
-                    node = nodes[n];
+                    node = this[n];
                     if(fn(node) === true) {
                         if(justOne) return node;
                         res.push(node);

@@ -1,4 +1,4 @@
-!function psudoQuerySelector () {
+!function psudoQuerySelector (doc) {
     if (doc.querySelectorAll) return;
     var head = doc.documentElement.firstChild;
     function createStyleTag () {

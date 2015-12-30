@@ -1,0 +1,42 @@
+@keyframes zan
+{
+    from {top:0px;}
+    to {
+        top:-20px;
+        opacity: 0;
+    }
+}
+
+@-moz-keyframes zan /* Firefox */
+{
+    from {top:0px;}
+    to {
+        top:-20px;
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes zan /* Safari 和 Chrome */
+{
+    from {top:0px;}
+    to {
+        top:-20px;
+        opacity: 0;
+    }
+}
+
+@-o-keyframes zan /* Opera */
+{
+    from {top:0px;}
+    to {
+        top:-20px;
+        opacity: 0;
+    }
+}
+.animate {
+    position: absolute;
+    animation:zan 0.5s 1;
+    -moz-animation:zan 0.5s 1; /* Firefox */
+    -webkit-animation:zan 0.5s 1; /* Safari and Chrome */
+    -o-animation:zan 0.5s 1; /* Opera */
+}

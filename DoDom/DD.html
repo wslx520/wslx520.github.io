@@ -35,7 +35,7 @@
     一个div
     <a href="#">a标签in div</a>
 </div>
-<div id="div2" class="aa bb div">
+<div id="div2" class="aa bb div" style="height: 400px; overflow: auto;">
     #div2
     <form action="" id="form2">
         <input type="text" name="" id="" /> <br />
@@ -46,15 +46,29 @@
         <input type="checkbox" name="check" id="" /> 11
         <input type="checkbox" name="check" id="" /> 22
         <input type="checkbox" name="check" id="" /> 33
+        <br />
+        <select name="sel" id="sel1">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">3</option>
+        </select>
     </form>
+    <div id="div3" style="height: 400px;">
+        #div3 in div2
+    </div>
 </div>
 <script src="DD.js"></script>
 <script>
     // console.log(dd($$('div')).addClass('bb b').removeClass('b').toggleClass('a b').hasClass('div'))
     var t = new Date().getTime();
-    console.log(dd($$('div')).prev())
+    console.log(dd($$('div')).prev().length)
     console.log(dd($$('div')).find('a').addClass('red'));
     console.log(new Date().getTime() -t);
+    var t = new Date().getTime();
+    console.log(document.getElementsByTagName('input'));
+    console.log(new Date().getTime() -t);
+
+
     // console.log(dd(document.getElementsByTagName('div')).siblings().length)
 
 </script>
