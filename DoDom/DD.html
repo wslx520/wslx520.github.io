@@ -11,6 +11,9 @@
     .red {
         color: #f00;
     }
+    .gray {
+        color: gray;
+    }
     #div2 {
         background-color: #eee;
         margin: 1em;
@@ -33,6 +36,8 @@
 
 <div id="div" class="a b c d div">
     一个div
+    <!-- 这是一段注释，测试IE下的chilren -->
+    <!-- 这又是一段注释，测试IE下的chilren -->
     <a href="#">a标签in div</a>
 </div>
 <div id="div2" class="aa bb div" style="height: 400px; overflow: auto;">
@@ -61,7 +66,10 @@
 <script>
     // console.log(dd($$('div')).addClass('bb b').removeClass('b').toggleClass('a b').hasClass('div'))
     var t = new Date().getTime();
-    console.log(dd($$('div')).prev().length)
+    console.log(dd($$('div')).prev().length);
+    // IE8及以下,node.children会把node里的注释节点算进去，导致得到的数量不正确
+    console.log(document.getElementById('div').children.length);
+    console.log(dd($$('div')).prev().addClass('gray'));
     console.log(dd($$('div')).find('a').addClass('red'));
     console.log(new Date().getTime() -t);
     var t = new Date().getTime();

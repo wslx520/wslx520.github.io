@@ -257,7 +257,7 @@ var dd,
                     }
                     first = first.nextSibling;
                 }
-                return siblings;
+                return new DoDom(siblings);
             },
             changeDisable = function (elm, dis, cls) {
                 elm.disabled = dis;
@@ -367,7 +367,7 @@ var dd,
                 // 只有一个class
                 if(singleClass) {
                     // 节点集里只有一个节点时
-                    if(this.length === 1) return hasClass(this[0], clses[0]);
+                    if(this.length === 1) return hasClass(this[0], clses);
                     for (n = 0, node; node = this[n++];) {
                         if (hasClass(node, clses)) {
                            return true;
