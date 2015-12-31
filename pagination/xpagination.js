@@ -134,7 +134,7 @@ var xPagination = function (doc) {
                     },
                     first: 1,
                     next: function () {
-                        return Options.curr >= pages ? pages : Options.curr + 1;
+                        return Options.curr >= Options.pages ? Options.pages : Options.curr + 1;
                     },
                     prev: function () {
                         return Options.curr <= 1 ? 1 : Options.curr - 1;
