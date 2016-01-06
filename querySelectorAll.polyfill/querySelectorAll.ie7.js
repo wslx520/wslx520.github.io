@@ -19,21 +19,13 @@ document.querySelectorAll = function(dom) {
         simpleReg = /^([\w-_]+)?(#|\.)?([\w-_]+)$/,
         selectorRegExp = /^([A-Za-z]+[1-6])?((#|\.)([w-]+))?(\[([\w-]+)([\!\*\^\$\~|]?\=)?(\.+)?\])?(\:(first-child|last-child))?/,
         selectorReg = {
-            id: regexp('^#' + letterStr + '[\\w-_\\:\\.]*'),
-            classes: regexp('^\\.' + letterStr + '[\\w-_\\:\\.]*'),
-            tag: regexp('^' + letterStr + '\+[1-6]?'),
+            id: /#([\w-]+)/,
+            // classes支持多个同时存在，其余均不支持
+            classes: /\.([\w-]+)/g,
+            tag: /([a-z]\w+)/,
             // attr:/^\[([\w-_]+)([\!\*\^\$\~\|]?\=)?(\w+)?\]/,
-            attr: regexp('^' + attrStr),
+            attr: /\[([\w-]+)([\!\*\^\$\~\|]?\=)?(\w+)?\]/,
             pseudo: /\:(first-child|last-child)+/
-        },
-        selectorRegFix = {
-            hasClass: /\./,
-            hasAttr: /\[.+\]/
-        },
-        selectorFilter = {
-            id: /#([\w-_])+/,
-            classes: /\.\w+/g,
-            attr: regexp(attrStr, 'g')
         },
         specialAttrs = {
             // 'for': 'htmlFor',
@@ -43,10 +35,8 @@ document.querySelectorAll = function(dom) {
             try {
                 return Array.prototype.slice.call(nodes);
             } catch (e) {
-                var res = [];
-                for (var n = 0, nl = nodes.length; n < nl; n++) {
-                    res.push(nodes[n]);
-                }
+                var res = [], n = nodes.length;
+                for (; n--; res[n] = nodes[n]);
                 return res;
             }
         },
@@ -62,22 +52,17 @@ document.querySelectorAll = function(dom) {
         byClass = function(cls, tag, par, attr) {
             var list = byTag(tag || '*', par),
                 resultArr = [],
-                g, i, item, className,
+                g, i = 0, item, className,
+                j = 0,
                 ifattr = !!attr;
-            cls = trim(cls).split(blank);
-            for (i = 0; item = list[i++];) {
+            // cls = trim(cls).split(blank);
+            for (; item = list[i++];) {
                 if (ifattr && !checkAttr(item, attr)) {
                     continue;
                 }
-                className = ' ' + item.className + ' ', f = 1;
-                for (g = cls.length; g--;) {
-                    //先判断class字符串是不是空的，以防出现传首尾有空格的参数'a b c   '时判断出错
-                    if (className.indexOf(' ' + cls[g] + ' ') == -1) {
-                        f = 0;
-                        break;
-                    }
+                if(filterFns.classes(item, cls)) {
+                    resultArr[j++] = item;
                 }
-                f && resultArr.push(item);
             };
             return resultArr;
         },
@@ -121,11 +106,11 @@ document.querySelectorAll = function(dom) {
                 return elm.getAttribute('id') === str;
             },
             classes: function(elm, str) {
-                var eClasses = elm.className,
-                    str = str.split(blank),
+                var eClasses = ' '+elm.className+' ',
+                    // str = str.split(blank),
                     s = str.length;
                 for (; s--;) {
-                    if (eClasses.search(regexp('\\b' + str[s] + '\\b')) === -1) {
+                    if (eClasses.indexOf(' ' + str[s] + ' ') < 0) {
                         return false;
                     }
                 }
@@ -154,7 +139,7 @@ document.querySelectorAll = function(dom) {
                 // body...
             }
         };
-        console.log(selectorRegExp)
+        // console.log(selectorRegExp)
     // 获取兄弟节点（可前可后）
     function getNode(elem, dir) {
         dir = dir || 'nextSibling';
@@ -189,9 +174,8 @@ document.querySelectorAll = function(dom) {
     }
     // 从属性字符串里分析出属性名，运算符，属性值
     function attrMatcher(str) {
-        console.log(str)
         var m;
-        if (m = selectorFilter.attr.exec(str)) {
+        if (m = selectorReg.attr.exec(str)) {
             return {
                 name: m[1],
                 operator: m[2],
@@ -200,15 +184,17 @@ document.querySelectorAll = function(dom) {
         }
     }
     var selectorTypes = {
-        '.': 'class',
+        '.': 'classes',
         '#': 'id',
         '[': 'attr',
         ':': 'pseudo'
-    }
+    }, typeArray = ['tag','id','classes','attr','pseudo'];
     function contains (str, substr) {
         return str.indexOf(substr) > -1;
     }
     // 快速判断出字符串里包含哪几种选择器
+    // 返回一个最长5个字节的由数字组成的字符串（基于“以最小消耗存储数据”的原则）
+    // 各数字对应：0tag,1id,2class,3attr,4pseudo
     function hasWhatSelectors (str) {
         var res = '',letter1 = str.charAt(0);
         if(!selectorTypes[letter1]) {
@@ -228,71 +214,54 @@ document.querySelectorAll = function(dom) {
         }
         return res;
     }
+    // 
+    function decorateProp (ct, prop, str) {
+        var type = typeArray[ct],
+            reg = selectorReg[type],
+            execs,
+            moreclass,
+            i = 0;
+        if(ct === 2) {
+            moreclass = [];
+            while(execs = reg.exec(str)) {
+                // moreclass.push(execs[1]);
+                moreclass[i++] = execs[1];
+            }
+            prop[type] = moreclass;
+        } else {
+            if(ct === 3) {
+                prop[type] = attrMatcher(str);
+            } else {
+                // console.log(reg.exec(str))
+                prop[type] = reg.exec(str)[1];
+            }           
+        }
+    }
     // 判断字符串匹配什么选择器
     function matcher(str, i, strArr) {
         var prop = {
                 string: str
             },
             letter1 = str.charAt(0),
+            types = hasWhatSelectors(str),
+            t = types.length,
             res, classes, id, i;
-        prop.type = selectorTypes[letter1] || 'tag';
-        for (i in selectorReg) {
-            res = selectorReg[i].exec(str);
-            if (res) {
-                classes = '';
-                id = '';
-                prop.type = i;
-                prop.id = (i === 'id') ? res[0].slice(1) : (id = str.match(selectorFilter.id)) && id[0].slice(1);
-
-                prop.tag = i === 'tag' && res[0];
-                prop.classes = (classes = str.match(selectorFilter.classes)) && (classes + "").replace(',', '').replace(/\./g, ' ');
-                prop.attr = attrMatcher(str);
-                if (prop.attr && prop.attr.name == 'name' && prop.attr.operator == '=' && prop.attr.value) {
-                    prop.type = 'name';
-                }
-                if(i == 'pseudo') {
-                    prop.pseudo = res[0];
-                }
-                break;
-            }
+        for(;t--;) {
+            decorateProp(types.charAt(t)-0, prop, str);
+        }        
+        if(prop.attr && prop.attr.name==='name' && prop.attr.value) {
+            prop.type = 'name';
+        } else {
+            prop.type = selectorTypes[letter1] || 'tag';
         }
-        return prop;
-    }
-    // 判断字符串匹配什么选择器 old
-    function matcher_old(str, i, strArr) {
-        var prop = {
-                string: str
-            },
-            res, classes, id, i;
-        for (i in selectorReg) {
-            res = selectorReg[i].exec(str);
-            if (res) {
-                classes = '';
-                id = '';
-                prop.type = i;
-                prop.id = (i === 'id') ? res[0].slice(1) : (id = str.match(selectorFilter.id)) && id[0].slice(1);
-
-                prop.tag = i === 'tag' && res[0];
-                prop.classes = (classes = str.match(selectorFilter.classes)) && (classes + "").replace(',', '').replace(/\./g, ' ');
-                prop.attr = attrMatcher(str);
-                if (prop.attr && prop.attr.name == 'name' && prop.attr.operator == '=' && prop.attr.value) {
-                    prop.type = 'name';
-                }
-                if(i == 'pseudo') {
-                    prop.pseudo = res[0];
-                }
-                break;
-            }
-        }
+        // console.log(prop);
         return prop;
     }
     // 根据字符串的类型等属性，生成元素验证函数
     function matchFilter(prop) {
         var fns = [],
             p;
-         console.log(prop)   
         for (p in prop) {
-            console.log(prop[p])
             if (prop[p] && filterFns[p]) {
                 filterFns[p].type = p;
                 fns.push(filterFns[p]);
@@ -301,7 +270,6 @@ document.querySelectorAll = function(dom) {
         // console.log(fns)
         return function(elm) {
             for (var f = fns.length; f--;) {
-                // console.log(fns[f])
                 if (false === fns[f](elm, prop[fns[f].type])) {
                     return false;
                 }
@@ -349,11 +317,12 @@ document.querySelectorAll = function(dom) {
             sa,
             last, 
             prop,
+            types,
             tempPool;
         for (; l--;) {
-            selectorArr[l] = selectorArr[l].split(/\s+/);
-            sa = selectorArr[l];
+            sa = selectorArr[l].split(/\s+/);
             last = sa.pop();
+            types = hasWhatSelectors(last);
             prop = matcher(last);
             // console.log(last,prop)
             if (prop.id) {
@@ -366,20 +335,23 @@ document.querySelectorAll = function(dom) {
                 // 如果此时除了tag和class外，还有attribute，就需要进一步过滤
                 // 为提高效率，此时可以加入回调函数判断attribute，供循环时调用，进一步剔除不符合的元素
                 // 此时不过滤，后面还是要循环过滤，但就多一次循环
-                var fn;
-
                 tempPool = byClass(prop.classes, prop.tag, doc, prop.attr);
             } else if (prop.tag) {
                 tempPool = byTag(prop.tag);
             }
             // console.log(prop.attr)
-            // 对元素集做预先过滤
-            tempPool = checkList(tempPool, prop);
+            // 对节点集做预先过滤
+            if(types.length > 1) {
+                tempPool = checkList(tempPool, prop);
+            }
             // 再往上级过滤
-            // res = sa.length ? filterElements_old(tempPool,sa) : tempPool;
-            tempPool.validNodeIndex = {};
-            res = sa.length ? filterElements(tempPool, sa) : tempPool;
-            // res = sa.length ? filterElements_new(tempPool,sa) : tempPool;
+            if(sa.length) {
+                tempPool.validNodeIndex = {};
+                res = filterElements(tempPool, sa);    
+            } else {
+                res = tempPool;
+            }
+            
             // console.log(prop,res)
         }
         return res;
@@ -389,39 +361,21 @@ document.querySelectorAll = function(dom) {
         var
             type = prop.type,
             // 得到要检查的属性
-            will = function() {
-                var r = [],
-                    p;
-                for (p in prop) {
-                    if (p !== 'string' && p !== 'type' && p !== prop['type'] && prop[p]) {
-                        r.push(p);
-                    }
-                }
-                return r;
-            }();
-        // console.log(prop,will)
-        // 如果没有要检查的属性，就直接返回原list
-        if (will.length < 1) return list.splice ? list : nodesToArray(list);
-        var i = 0,
+            will = matchFilter(prop),
+            i = 0,
+            j = 0,
             l = list.length,
             res = [],
-            ll,
-            t, w, p, pp;
+            ll;
         for (; i < l; i++) {
             ll = list[i];
-            for (t = true, w = will.length; w--;) {
-                p = will[w], pp = prop[p];
-                // console.log(p,  pp)
-                if (pp && filterFns[p](ll, pp) == false) {
-                    t = !t;
-                    break;
-                }
+            if(will(ll)) {
+                // res.push(ll);
+                res[j++] = ll;
             }
-            t && res.push(ll);
         }
         return res;
     }
-
     function checkAttr(elm, attr) {
         // attr is an Object, contains [name],[operator],[value]
         // 修复特殊属性名
@@ -480,7 +434,7 @@ document.querySelectorAll = function(dom) {
             // 这样写比用正则或indexOf快得多
             operator = (str === '>' || str === '~' || str === '+') && str,
             str = operator ? ss.pop() : str,
-            // 是否还需要继续过滤
+            // 是否还需要继续过滤(再没有需要过滤的选择器字符串了，当然就停了)
             notcontinue = ss.length === 0,
             target = 'parentNode',
             justOne, //是否查找到一个元素就停止
@@ -488,6 +442,7 @@ document.querySelectorAll = function(dom) {
             fn = matchFilter(prop),
             res = [],
             l = 0,
+            j = 0,
             ll = list.length,
             elm, par,
             validNodeIndex, vali,
@@ -501,7 +456,6 @@ document.querySelectorAll = function(dom) {
             justOne = operator !== '~';
         }
         validNodeIndex = list.validNodeIndex;
-        // console.log(list);
         for (; l < ll; l++) {
             if (validNodeIndex[l] !== false) {
                 elm = list[l];
@@ -515,7 +469,8 @@ document.querySelectorAll = function(dom) {
                     if (fn(par) === true) {
                         vali = true;
                         if (notcontinue) {
-                            res.push(elm);
+                            // res.push(elm);
+                            res[j++] = elm;
                         }
                         break;
                     }
@@ -528,6 +483,7 @@ document.querySelectorAll = function(dom) {
                 if (vali && allFailed) allFailed = false;
             }
         }
+        // console.log(list.validNodeIndex)
         if (allFailed) return null;
         if (notcontinue) {
             // 直接使用 delete IE7报错
@@ -535,105 +491,6 @@ document.querySelectorAll = function(dom) {
             return res.length ? res : null;
         }
         return filterElements(list, ss);
-    }
-
-    function filterElements_old(list, ss) {
-        // 此时的ss是剩下的选择器字符串
-        var str = ss.pop(),
-            // 这样写比用正则或indexOf快得多
-            operator = (str === '>' || str === '~' || str === '+') && str,
-            str = operator ? ss.pop() : str,
-            target = 'parentNode',
-            justOne, //是否查找到一个元素就停止
-            prop = matcher(str),
-            fn = matchFilter(prop),
-            res = [],
-            l = 0,
-            ll = list.length,
-            elm, par;
-        // if(!list.validNodeIndex) {
-        //     list.validNodeIndex = [];
-        // }
-        // 如果取得的字符段是关系符，则再进一步取下一字符段
-        if (operator) {
-            if (operator !== '>') {
-                target = 'previousSibling';
-            }
-            justOne = operator !== '~';
-        }
-        // console.log(list);
-        for (; l < ll; l++) {
-            elm = list[l], par = elm[target];
-            // console.log(target,par,justOne)
-            while (par && par !== dom) {
-                if (par.nodeType == 1) {
-                    if (fn(par) === true) {
-                        res.push(elm);
-                        break;
-                    }
-                    if (justOne) {
-                        break;
-                    }
-                }
-                par = par[target];
-            }
-        }
-        // 根据选择器字符串剩余，选择递归过滤或返回结果
-        return ss[0] && res[0] ? filterElements_old(res, ss) : res;
-    }
-
-    function filterElements_new(list, ss) {
-        // 此时的ss是剩下的选择器字符串
-        var str = ss.pop(),
-            // 这样写比用正则或indexOf快得多
-            operator = (str === '>' || str === '~' || str === '+') && str,
-            str = operator ? ss.pop() : str,
-            target = 'parentNode',
-            justOne, //是否查找到一个元素就停止
-            prop = matcher(str),
-            fn = matchFilter(prop),
-            l = 0,
-            ll = list.length,
-            elm, par,
-            vali;
-        // if(!list.validNodeIndex) {
-        //     list.validNodeIndex = [];
-        // }
-        // 如果取得的字符段是关系符，则再进一步取下一字符段
-        if (operator) {
-            if (operator !== '>') {
-                target = 'previousSibling';
-            }
-            justOne = operator !== '~';
-        }
-        // console.log(list);
-        for (; l < ll; l++) {
-            elm = list[l], par = elm[target];
-            vali = false;
-            // console.log(target,par,justOne)
-            while (par && par !== dom) {
-                if (par.nodeType == 1) {
-                    if (fn(par) === true) {
-                        vali = true;
-                        break;
-                    }
-                    if (justOne) {
-                        break;
-                    }
-                }
-                par = par[target];
-            }
-            if (!vali) {
-                list.splice(l, 1);
-                ll--;
-            }
-        }
-        // console.log(ss.length, list.length)
-        if (ss.length && list.length) {
-            return filterElements_new(list, ss);
-        }
-        // 根据选择器字符串剩余，选择递归过滤或返回结果
-        return list;
     }
     return selector;
 }(document);
