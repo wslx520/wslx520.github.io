@@ -1,5 +1,5 @@
-// document.querySelectorAll = document.querySelectorAll || function(dom) {
-document.querySelectorAll = function(dom) {
+document.querySelectorAll = document.querySelectorAll || function(dom) {
+// document.querySelectorAll = function(dom) {
     var
         html = dom.documentElement,
         body = dom.body,
@@ -16,13 +16,13 @@ document.querySelectorAll = function(dom) {
             return new RegExp(str, gi || '');
         },
         // 只有一个选择器，如#id,.classes,div,div.classes
-        simpleReg = /^([\w-_]+)?(#|\.)?([\w-_]+)$/,
+        simpleReg = /^([a-z1-6]+)?(#|\.)?([\w-_]+)$/i,
         selectorRegExp = /^([A-Za-z]+[1-6])?((#|\.)([w-]+))?(\[([\w-]+)([\!\*\^\$\~|]?\=)?(\.+)?\])?(\:(first-child|last-child))?/,
         selectorReg = {
             id: /#([\w-]+)/,
             // classes支持多个同时存在，其余均不支持
             classes: /\.([\w-]+)/g,
-            tag: /([a-z]\w+)/,
+            tag: /([a-z](\w+)?)/i,
             // attr:/^\[([\w-_]+)([\!\*\^\$\~\|]?\=)?(\w+)?\]/,
             attr: /\[([\w-]+)([\!\*\^\$\~\|]?\=)?(\w+)?\]/,
             pseudo: /\:(first-child|last-child)+/
@@ -32,13 +32,8 @@ document.querySelectorAll = function(dom) {
             // 'class': 'className'
         },
         nodesToArray = function(nodes) {
-            try {
-                return Array.prototype.slice.call(nodes);
-            } catch (e) {
-                var res = [], n = nodes.length;
-                for (; n--; res[n] = nodes[n]);
-                return res;
-            }
+            for (var res = [], n = nodes.length; n--; res[n] = nodes[n]);
+            return res;
         },
         byId = function(id) {
             return dom.getElementById(id);
@@ -110,7 +105,7 @@ document.querySelectorAll = function(dom) {
                     // str = str.split(blank),
                     s = str.length;
                 for (; s--;) {
-                    if (eClasses.indexOf(' ' + str[s] + ' ') < 0) {
+                    if (!contains(eClasses, ' ' + str[s] + ' ')) {
                         return false;
                     }
                 }
@@ -123,21 +118,33 @@ document.querySelectorAll = function(dom) {
             'first-child': function(elm) {
                 return elm === getFirstOrLast(elm.parentNode);
             },
-            'last-child': function(elm) {
-                return elm === getFirstOrLast(elm.parentNode, 'last');
-            }
-        },
-        // 伪元素选择器:first-child 等
-        pseudoSelector = {
             'first-child': function(elm) {
-                return elm === getFirstOrLast(elm.parentNode);
-            },
+                var lastParent = null,
+                    lastFirstChild = null;
+                return function (elm) {
+                    // 如果这次判断的节点的父元素，与上次的父元素是同一个元素，则不再去获取“父元素的第一个子元素”
+                    // console.log(elm.parentNode === lastParent)
+                    if(elm.parentNode !== lastParent) {
+                        lastParent = elm.parentNode;
+                        lastFirstChild = getFirstOrLast(lastParent);
+                    }
+                    return elm === lastFirstChild;
+                }
+                // return elm === getFirstOrLast(elm.parentNode);
+            }(),
             'last-child': function(elm) {
-                return elm === getFirstOrLast(elm.parentNode, 'last');
-            },
-            'nth-child': function(argument) {
-                // body...
-            }
+                var lastParent = null,
+                    lastLastChild = null;
+                return function (elm) {
+                    // 如果这次判断的节点的父元素，与上次的父元素是同一个元素，则不再去获取“父元素的最后一个子元素”
+                    // console.log(elm.parentNode === lastParent)
+                    if(elm.parentNode !== lastParent) {
+                        lastParent = elm.parentNode;
+                        lastLastChild = getFirstOrLast(lastParent, 'last');
+                    }
+                    return elm === lastLastChild;
+                }
+            }()
         };
         // console.log(selectorRegExp)
     // 获取兄弟节点（可前可后）
@@ -232,7 +239,6 @@ document.querySelectorAll = function(dom) {
             if(ct === 3) {
                 prop[type] = attrMatcher(str);
             } else {
-                // console.log(reg.exec(str))
                 prop[type] = reg.exec(str)[1];
             }           
         }
@@ -258,18 +264,23 @@ document.querySelectorAll = function(dom) {
         return prop;
     }
     // 根据字符串的类型等属性，生成元素验证函数
-    function matchFilter(prop) {
+    function matchFilter(prop, checkType) {
         var fns = [],
-            p;
+            p, fp;
         for (p in prop) {
-            if (prop[p] && filterFns[p]) {
-                filterFns[p].type = p;
-                fns.push(filterFns[p]);
+            // console.log(p, prop[p])
+            if (p !== 'type' && p !== 'string' && prop[p]) {
+                fp = p==='pseudo' ? filterFns[prop[p]] : filterFns[p];
+                if(fp) {
+                    fp.type = p;
+                    fns.push(fp);    
+                }                                
             }
         }
         // console.log(fns)
         return function(elm) {
             for (var f = fns.length; f--;) {
+                // console.log(fns[f].type, fns[f](elm, prop[fns[f].type]), elm)
                 if (false === fns[f](elm, prop[fns[f].type])) {
                     return false;
                 }
@@ -307,53 +318,46 @@ document.querySelectorAll = function(dom) {
         }
         return simulateQuery(str);
     }
-    //查询函数 
+    //选择器函数 
     function simulateQuery(str) {
         // console.log(str)
-        var res = [],
-            selectorArr = str.split(','),
-            oneGroup = (selectorArr.length == 1),
-            l = selectorArr.length,
-            sa,
-            last, 
-            prop,
-            types,
-            tempPool;
-        for (; l--;) {
-            sa = selectorArr[l].split(/\s+/);
-            last = sa.pop();
-            types = hasWhatSelectors(last);
-            prop = matcher(last);
-            // console.log(last,prop)
-            if (prop.id) {
-                tempPool = byId(prop.id);
-            } else if (prop.type === 'name') {
-                // 针对name做特别处理
-                tempPool = byName(prop.attr.value);
-            } else if (prop.classes) {
-                // 如果有tag，则byClass就会在返回前循环一遍以判断tag符合与否。
-                // 如果此时除了tag和class外，还有attribute，就需要进一步过滤
-                // 为提高效率，此时可以加入回调函数判断attribute，供循环时调用，进一步剔除不符合的元素
-                // 此时不过滤，后面还是要循环过滤，但就多一次循环
-                tempPool = byClass(prop.classes, prop.tag, doc, prop.attr);
-            } else if (prop.tag) {
-                tempPool = byTag(prop.tag);
-            }
-            // console.log(prop.attr)
-            // 对节点集做预先过滤
-            if(types.length > 1) {
-                tempPool = checkList(tempPool, prop);
-            }
-            // 再往上级过滤
-            if(sa.length) {
-                tempPool.validNodeIndex = {};
-                res = filterElements(tempPool, sa);    
-            } else {
-                res = tempPool;
-            }
-            
-            // console.log(prop,res)
+        if(contains(str, ',')) {
+            throw new Error('暂不支持多组选择器');
         }
+        var res = [],
+            selectorArr = str.split(/\s+/),
+            last = selectorArr.pop(), 
+            prop = matcher(last),
+            types = hasWhatSelectors(last),
+            tempPool;
+        // console.log(last,prop)
+        if (prop.id) {
+            tempPool = byId(prop.id);
+        } else if (prop.type === 'name') {
+            // 针对name做特别处理
+            tempPool = byName(prop.attr.value);
+        } else if (prop.classes) {
+            // 如果有tag，则byClass就会在返回前循环一遍以判断tag符合与否。
+            // 如果此时除了tag和class外，还有attribute，就需要进一步过滤
+            // 为提高效率，此时可以加入回调函数判断attribute，供循环时调用，进一步剔除不符合的元素
+            // 此时不过滤，后面还是要循环过滤，但就多一次循环
+            tempPool = byClass(prop.classes, prop.tag, doc, prop.attr);
+        } else if (prop.tag) {
+            tempPool = byTag(prop.tag);
+        }
+        // console.log(prop.attr)
+        // 对节点集做预先过滤
+        if(types.length > 1) {
+            tempPool = checkList(tempPool, prop);
+        }
+        // 再往上级过滤
+        if(selectorArr.length) {
+            tempPool.validNodeIndex = {};
+            res = filterElements(tempPool, selectorArr);    
+        } else {
+            res = tempPool;
+        }
+        
         return res;
     }
 
@@ -412,13 +416,13 @@ document.querySelectorAll = function(dom) {
             operator === "^=" ? check && result.indexOf(check) === 0 :
 
             //这样解释： lang*=en 匹配这样 <html lang="xxxxenxxx">的节点
-            operator === "*=" ? check && result.indexOf(check) > -1 :
+            operator === "*=" ? check && contains(result, check) :
 
             //如果是末尾相等，判断目标值是否在当前属性值的末尾
             operator === "$=" ? check && result.slice(-check.length) === check :
 
             //这样解释： lang~=en 匹配这样 <html lang="zh_CN en">的节点
-            operator === "~=" ? (" " + result + " ").indexOf(check) > -1 :
+            operator === "~=" ? contains(" " + result + " ", check) :
 
             //这样解释： lang=|en 匹配这样 <html lang="en-US">的节点
             operator === "|=" ? result === check || result.slice(0, check.length + 1) === check + "-" :
@@ -439,7 +443,7 @@ document.querySelectorAll = function(dom) {
             target = 'parentNode',
             justOne, //是否查找到一个元素就停止
             prop = matcher(str),
-            fn = matchFilter(prop),
+            fn = matchFilter(prop, true),
             res = [],
             l = 0,
             j = 0,
