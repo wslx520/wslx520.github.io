@@ -32,6 +32,10 @@ JS实现选中文本框内部分文字的效果：
 <p>
 	建议在设置选取范围时，起点要小于终点
 </p>
+<button type="button" onclick="$('tt').focus()">点这个按钮会让下方的textarea获取焦点</button>
+获得焦点时，浏览器滚动条会滚到此时获得焦点的元素处.
+<div style="height: 700px;"></div>
+<textarea name="" id="tt" cols="30" rows="10"></textarea>
 <script type="text/javascript">
 var textSelect = function(o, a, b){
 	//o是当前对象，例如文本域对象

@@ -166,7 +166,13 @@ document.querySelectorAll = document.querySelectorAll || function(dom) {
         }
         return null;
     }
-
+    function getPrev (elem) {
+        elem = elem.previousSibling;
+        while(elem && elem.nodeType !== 1) {
+            elem = elem.previousSibling;
+        }
+        return elem;
+    }
     function getFirstOrLast(elem, fol) {
         var node = fol === 'last' ? elem.lastChild : elem.firstChild,
             sibling = fol === 'last' ? 'previousSibling' : 'nextSibling';
@@ -437,6 +443,7 @@ document.querySelectorAll = document.querySelectorAll || function(dom) {
         var str = ss.pop(),
             // 这样写比用正则或indexOf快得多
             operator = (str === '>' || str === '~' || str === '+') && str,
+            // 如果取得的字符段是关系符，则再进一步取下一字符段
             str = operator ? ss.pop() : str,
             // 是否还需要继续过滤(再没有需要过滤的选择器字符串了，当然就停了)
             notcontinue = ss.length === 0,
@@ -452,7 +459,6 @@ document.querySelectorAll = document.querySelectorAll || function(dom) {
             validNodeIndex, vali,
             // 是否此次过滤全部失败
             allFailed = true;
-        // 如果取得的字符段是关系符，则再进一步取下一字符段
         if (operator) {
             if (operator !== '>') {
                 target = 'previousSibling';
@@ -466,25 +472,27 @@ document.querySelectorAll = document.querySelectorAll || function(dom) {
                 par = elm[target];
                 vali = false;
                 // console.log(target,par,justOne)
-                while (par && par.nodeType == 1) {
+                // 当是 previousSibling 时，可能nodeType就不是1了，会意外中断
+                // while (par && par.nodeType == 1) {
+                while (par && !vali) {
                     if (par === dom.body || par === html) {
                         break;
                     }
-                    if (fn(par) === true) {
-                        vali = true;
-                        if (notcontinue) {
-                            // res.push(elm);
-                            res[j++] = elm;
-                        }
-                        break;
-                    }
-                    if (justOne) {
+                    vali = fn(par);
+                    if (justOne && par.nodeType === 1) {
                         break;
                     }
                     par = par[target];
                 }
                 validNodeIndex[l] = vali;
-                if (vali && allFailed) allFailed = false;
+                if(vali) {
+                    if (notcontinue) {
+                        // res.push(elm);
+                        res[j++] = elm;
+                    }
+                    allFailed && (allFailed = false);
+                }
+                // if (vali && allFailed) allFailed = false;
             }
         }
         // console.log(list.validNodeIndex)
