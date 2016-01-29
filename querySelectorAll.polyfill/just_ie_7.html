@@ -8,12 +8,24 @@
   <meta name="keywords" content="" />
   <meta name="description" content="" />
     <style>
-
+        .a {
+            color: #f00;
+        }
+        .a.b {
+            border: 1px solid #f00;
+        }
+        .b {
+            border: 1px solid #00f;
+        }
     </style>
 
  </head>
 
  <body>
+    <div class="a b">
+        并联生效样式
+    </div>
+    <div class="b">b</div>
     jq選擇器返回的結果，是個數組，但其原型中帶有一系列的自有方法，如attr,addClass等。
         <h2>选择器使用纪要</h2>
     <p>因为本选择器及jQuery选择器等，均是从右到左解析选择字符串，所以尽量在最右边就过滤掉大部分不合格元素</p>
