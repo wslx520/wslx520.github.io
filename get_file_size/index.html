@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>在上传之前就获取文件大小</title>
+</head>
+<body>
+<input type="text" id="input" placeholder="ppppppppp" onblur="" />
+<br />
+<form name="upload">
+<input type="file" name="file" id="file">
+<input type="button" value="Size?" onClick="getSize();">
+</form>
+<script>
+	function $ (id) {
+		return document.getElementById(id);
+	}
+</script>
+<script>
+function getSize()
+{
+    var html5 = window.File && window.FileReader && window.FileList
+        && window.Blob && window.FormData;
+    var size;
+    if(html5) {
+        if($('file').files[0]) {
+            size = $('file').files[0].size;
+        }
+        console.log(size);
+    } else {
+        var myFSO = new ActiveXObject("Scripting.FileSystemObject");
+        var filepath = document.upload.file.value;
+        var thefile = myFSO.getFile(filepath);
+        var size = thefile.size;    
+    }
+    
+    alert(size + " bytes");
+}
+</script>
+</body>
+</html>
