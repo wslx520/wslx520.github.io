@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>canvas drawimage效率测试</title>
+</head>
+<body>
+    <img src="1.png" alt="" id="img" />
+    <input type="file" name="file" id="file" />
+    <canvas id="bigcanvas" width="1000" height="1000"></canvas>
+    <canvas id="smallcanvas" width="100" height="100"></canvas>
+<script>
+    var img = document.getElementById('img');
+    var file = document.getElementById('file');
+    var bigcanvas = document.getElementById('bigcanvas');
+    var smallcanvas = document.getElementById('smallcanvas');
+    var big = bigcanvas.getContext('2d');
+    var small = smallcanvas.getContext('2d');
+    img.onload = function () {
+        var t = Date.now();
+        small.drawImage(img,0,0,100,100);
+        console.log(Date.now() - t);
+        t = Date.now();
+        big.drawImage(img,0,0,1000,1000);
+        console.log(Date.now() - t);
+
+    }
+    var reader= new FileReader();
+    reader.onload = function (e) {
+        console.log(e.target.result);
+        var file = e.target.result;
+            var t = Date.now();
+            small.drawImage(file,0,0,100,100);
+            console.log(Date.now() - t);
+            t = Date.now();
+            big.drawImage(file,0,0,1000,1000);
+            console.log(Date.now() - t);
+    }
+    file.onchange = function () {
+        if(this.files[0]) {
+            var file = this.files[0];
+            reader.readAsDataURL(file);
+        }
+
+    }
+</script>
+</body>
+</html>
