@@ -1,0 +1,55 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml">
+ 
+<head id="Head1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style type="text/css">
+    .image_container {
+        width: 48px;
+        height: 48px;
+        position: relative;
+    }
+    </style>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script language="javascript">
+    $(function() {
+        $("#file_upload").change(function() {
+            var $file = $(this);
+            var fileObj = $file[0];
+            var windowURL = window.URL || window.webkitURL;
+            var dataURL;
+            var $img = $("#preview");
+ 
+            if(fileObj && fileObj.files && fileObj.files[0]){
+                dataURL = windowURL.createObjectURL(fileObj.files[0]);
+                $img.attr('src',dataURL);
+            }else{
+                dataURL = $file.val();
+ 
+                // $img.css("filter",'progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod = scale,src="' + dataURL + '")');
+ 
+                // var imgObj = document.getElementById("preview");
+                // imgObj.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src=\"" + dataURL + "\")";
+                // imgObj.style.width = "48px";
+                // imgObj.style.height = "48px";
+ 
+                var imgObj = document.getElementById("preview");
+                // 两个坑:
+                // 1、在设置filter属性时，元素必须已经存在在DOM树中，动态创建的Node，也需要在设置属性前加入到DOM中，先设置属性在加入，无效；
+                // 2、src属性需要像下面的方式添加，上面的两种方式添加，无效；
+                imgObj.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
+                imgObj.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = dataURL;
+ 
+            }
+        });
+    });
+    </script>
+</head>
+<body>
+    <div id="demo">
+        <input id="file_upload" type="file" />
+        <div class="image_container">
+            <img id="preview" width="60" height="60">
+        </div>
+    </div>
+</body>
+</html>
