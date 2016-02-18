@@ -32,7 +32,8 @@ function previewImage(file)
   {
     var sFilter='filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src="';
     file.select();
-    var src = document.selection.createRange().text;
+    // var src = document.selection.createRange().text;
+    var src = file.value;
     div.innerHTML = '<img id=imghead>';
     var img = document.getElementById('imghead');
     img.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
