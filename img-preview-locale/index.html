@@ -32,7 +32,10 @@ function previewImage(file)
   {
     var sFilter='filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src="';
     file.select();
+    //解决IE9下document.selection拒绝访问的错误
+    // blur适合 file不是在iframe下的情况
     file.blur();
+    // anotherdiv.focus() 适合所有情况，但div必须有1像素的宽高 http://gallop-liu.iteye.com/blog/1344778
     var src = document.selection.createRange().text;
     // var src = file.value;
     div.innerHTML = '<img id=imghead>';
