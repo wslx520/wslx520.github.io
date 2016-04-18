@@ -3,9 +3,26 @@
 <head>
 	<meta charset="UTF-8" />
 	<title>xtml: javascript模板引擎</title>
+    <style>
+    .div {
+        max-width: 500px;
+        border: 1px solid red;
+    }
+    </style>
 </head>
 <body>
 	<input type="file" name="" id="" title=" " />
-	<script src="xtml.js"></script>
+    模板：
+    <textarea class="div" id="mb" cols="50" rows="10"></textarea>
+    编译后：
+    <textarea class="div" id="by" cols="50" rows="10"></textarea>
+    渲染结果：
+    <textarea class="div" id="result" cols="50" rows="10"></textarea>
+    <script>
+    var $ = function (id) {
+        return document.getElementById(id);
+    }
+    </script>
+    <script src="xtml.js"></script>
 </body>
 </html>
