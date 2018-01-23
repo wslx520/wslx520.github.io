@@ -61,6 +61,94 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-visual-studio-ESList-plugin" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018-01-23/visual-studio-ESList-plugin/" class="article-date">
+  <time datetime="2018-01-23T03:07:37.000Z" itemprop="datePublished">2018-01-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018-01-23/visual-studio-ESList-plugin/">visual studio ESList plugin</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>虽然我不用visual studio 开发前端代码,但还是记录一下.</p>
+<p>即使你使用的VS2017,内置了eslint,你还是会发现根本用不了.</p>
+<p>我尝试出的办法是使用插件: VisualLinter</p>
+<p>链接如下:</p>
+<p><a href="https://marketplace.visualstudio.com/items?itemName=JeanAlexanderWoldner.VisualLinter" target="_blank" rel="noopener">https://marketplace.visualstudio.com/items?itemName=JeanAlexanderWoldner.VisualLinter</a></p>
+<p>安装后可获得与 vscode 里一致的 ESLint 体验</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018-01-23/visual-studio-ESList-plugin/" data-id="cjcr2er6d0006zwvxzpjbdqt7" class="article-share-link">Teilen</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-uglify-mangle-ie8" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018-01-18/uglify-mangle-ie8/" class="article-date">
+  <time datetime="2018-01-18T08:13:11.000Z" itemprop="datePublished">2018-01-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018-01-18/uglify-mangle-ie8/">gulp uglify mangle ie8</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>使用 gulp-uglify 打包出来后, art-template 在IE8-就不能用了, 直接报模板错误.加上 mangle: false 就可以用</p>
+<p>但mangle: false相当于没有混淆变量名, 只要使用简单的格式化就能像阅读源码一样看打包后的代码了.</p>
+<p>所以我打算研究下,既要mangle,也要ie7</p>
+<p>我将原版3.1.0的template.min.js与我们压缩后的template.js, 进行 <strong>格式化-diff软件</strong> 找不同, 发现一个比较显著的差异: 我们打包出来的,会把写在后面的函数声明,提到最前面.于是辗转找到了<strong>hoist_funs</strong> 参数</p>
+<p>研究出来了开启mangle在IE7下也不报错的办法： </p>
+<p>1，compress.hoist_funs=false，表示打包时不自动将函数声明提升到作用域顶部。配置这个之后设置mangle=true，打包出来的<a href="http://tempalte.js/" target="_blank" rel="noopener">tempalte.js</a>已经可用</p>
+<p>2，mangle.reserved：这里用来定义打乱时不动的变量名。因为第一步打包出来的代码，会导致validate插件在IE8-报“缺少对象”。尝试了几次后确定了这个方法</p>
+<p>加上这个参数的坏处是,代码里的 $ 就变得很显眼了</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">.pipe(uglify(&#123;</span><br><span class="line"></span><br><span class="line">	mangle: &#123;<span class="attr">reserved</span>: [<span class="string">'e'</span>,<span class="string">'$'</span>]&#125;,</span><br><span class="line"></span><br><span class="line">	compress: &#123;<span class="attr">hoist_funs</span>: <span class="literal">false</span>&#125;</span><br><span class="line"></span><br><span class="line">&#125;))</span><br></pre></td></tr></table></figure>
+<h2 id="更简单的办法"><a href="#更简单的办法" class="headerlink" title="更简单的办法"></a>更简单的办法</h2><p>uglify({ie8: true}) // uglify-js 3.0+</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018-01-18/uglify-mangle-ie8/" data-id="cjcr2er6b0005zwvx3qjmd8s3" class="article-share-link">Teilen</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-self-suggestion" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018-01-16/self-suggestion/" class="article-date">
@@ -92,7 +180,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018-01-16/self-suggestion/" data-id="cjchhnrj90000wovxgulc4uo9" class="article-share-link">Teilen</a>
+      <a data-url="http://yoursite.com/2018-01-16/self-suggestion/" data-id="cjcr2er690004zwvxwnt10boh" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -130,7 +218,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018-01-16/first-hexo/" data-id="cjchhn1ou0000mgvxc1lt0ae4" class="article-share-link">Teilen</a>
+      <a data-url="http://yoursite.com/2018-01-16/first-hexo/" data-id="cjcr2er620001zwvx9fh29iaj" class="article-share-link">Teilen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo-test/">hexo test</a></li></ul>
@@ -177,7 +265,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018-01-15/hello-world/" data-id="cjchhn1pd0003mgvxs0dwri91" class="article-share-link">Teilen</a>
+      <a data-url="http://yoursite.com/2018-01-15/hello-world/" data-id="cjcr2er650002zwvxcrg6is9q" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -277,7 +365,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018-01-12/es5 new Array methods/" data-id="cjchhn1p70001mgvxr9envcpe" class="article-share-link">Teilen</a>
+      <a data-url="http://yoursite.com/2018-01-12/es5 new Array methods/" data-id="cjcr2er5u0000zwvxqn6am0s5" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -332,6 +420,14 @@
       <ul>
         
           <li>
+            <a href="/2018-01-23/visual-studio-ESList-plugin/">visual studio ESList plugin</a>
+          </li>
+        
+          <li>
+            <a href="/2018-01-18/uglify-mangle-ie8/">gulp uglify mangle ie8</a>
+          </li>
+        
+          <li>
             <a href="/2018-01-16/self-suggestion/">编程,给自己的两个忠告</a>
           </li>
         
@@ -341,10 +437,6 @@
         
           <li>
             <a href="/2018-01-15/hello-world/">Hello World</a>
-          </li>
-        
-          <li>
-            <a href="/2018-01-12/es5 new Array methods/">es5 new Array methods</a>
           </li>
         
       </ul>
